@@ -12,7 +12,7 @@ import { EnvironmentBack, Atmosphere } from "./parts/Environment";
 import { Overgrowth, Pot } from "./parts/Overgrowth";
 import { Bicycle } from "./parts/Bicycle";
 
-const DROP_MS = 850;
+const DROP_MS = 1000;
 
 export default function VendingMachine() {
   const router = useRouter();
@@ -47,10 +47,18 @@ export default function VendingMachine() {
   const dropDist = dispensing ? DROP_LAND_Y - SHELF_CAN_Y[dispensing.shelf] : 0;
 
   return (
-    <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4">
+    <div
+      className="h-[calc(100dvh-2.5rem)] w-full overflow-hidden select-none flex items-center justify-center"
+      style={{
+        // ambient extension of the scene: wall green in the middle fading to
+        // near-black, so the SVG's vignetted edges blend instead of seaming
+        background:
+          "radial-gradient(140% 120% at 50% 42%, #141a14 0%, #10150f 45%, #070a07 100%)",
+      }}
+    >
       <svg
         viewBox="0 0 480 680"
-        style={{ width: "min(94vw, 480px)", height: "auto" }}
+        className="h-full w-full"
         aria-label="ICreate4Freedom navigation — a vending machine reclaimed by plants; each button vends a page"
       >
         <defs>

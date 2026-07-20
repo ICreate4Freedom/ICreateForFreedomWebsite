@@ -13,8 +13,8 @@ export function LowerDoor() {
       <g clipPath="url(#vm-doorClip)">
         <path d="M84,486 C160,432 250,536 300,478 C336,438 380,462 410,442 L410,566 L84,566 Z" fill="#f2f5f8" />
         <path d="M84,506 C168,458 246,548 306,496 C342,462 384,482 410,466 L410,566 L84,566 Z" fill="#2b7ccb" opacity="0.35" />
-        <text x="126" y="428" fontFamily="ui-sans-serif, system-ui, sans-serif" fontStyle="italic" fontWeight="800" fontSize="26" fill="#f2f5f8" opacity="0.9">
-          ICREATE4FR
+        <text x="115" y="428" fontFamily="ui-sans-serif, system-ui, sans-serif" fontStyle="italic" fontWeight="800" fontSize="26" fill="#f2f5f8" opacity="0.9">
+          ICREATE4FREEDOM
         </text>
       </g>
       <rect x="150" y="504" width="140" height="42" rx="6" fill="#14171b" stroke="#b9bdc2" strokeWidth="2" />

@@ -32,7 +32,8 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <div className="flex-1">{children}</div>
         {/* plain-text fallback for the vending-machine nav */}
-        <footer className="bg-neutral-950 py-3 text-center font-mono text-xs text-neutral-500">
+        {/* fixed h-10 (2.5rem): pages size themselves with calc(100dvh-2.5rem) */}
+        <footer className="flex h-10 items-center justify-center bg-neutral-950 font-mono text-xs text-neutral-500">
           <nav aria-label="Site navigation">
             <Link href="/" className="mx-2 hover:text-neutral-300">
               home

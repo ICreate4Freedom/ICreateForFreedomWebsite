@@ -5,7 +5,7 @@ export const metadata: Metadata = { title: "Writing — ICreate4Freedom" };
 
 export default function WritingPage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#fdf0e3] text-[#93481a]">
+    <main className="flex min-h-[calc(100dvh-2.5rem)] flex-col items-center justify-center gap-4 bg-[#fdf0e3] text-[#93481a]">
       <h1 className="text-4xl font-bold">Writing</h1>
       <p className="opacity-70">The INK can. Page under construction.</p>
       <Link href="/" className="underline underline-offset-4">
