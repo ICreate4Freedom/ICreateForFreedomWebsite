@@ -17,8 +17,6 @@ export function Bicycle() {
     <g strokeLinecap="round">
       <Wheel cx={140} cy={572} r={54} />
       <Wheel cx={300} cy={566} r={58} />
-      <path d="M92,560 A54,54 0 0 1 140,514" fill="none" stroke="#3a463d" strokeWidth="6" />
-      <path d="M248,552 A58,58 0 0 1 352,558" fill="none" stroke="#3a463d" strokeWidth="6" />
       <g stroke="#33413a" strokeWidth="7" fill="none">
         <line x1="232" y1="560" x2="155" y2="492" />
         <line x1="158" y1="488" x2="243" y2="484" />

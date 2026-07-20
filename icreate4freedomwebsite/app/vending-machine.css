@@ -13,3 +13,9 @@
   0%, 100% { transform: rotate(0deg); }
   50%      { transform: rotate(2.6deg); }
 }
+
+/* Wayside annotations that only make sense when the wide scene is visible;
+   on narrow screens the scene crops to the machine and these would dangle. */
+@media (max-width: 768px) {
+  .vm-wide-only { display: none; }
+}
