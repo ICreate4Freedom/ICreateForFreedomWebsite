@@ -1,0 +1,15 @@
+/* Vending machine keyframes — import once from app/globals.css:
+   @import "./vending-machine.css";
+   The drop distance is set per-dispense via --vm-drop-dist on the falling can. */
+
+@keyframes vm-drop {
+  0%   { transform: translateY(0) rotate(0deg); }
+  70%  { transform: translateY(var(--vm-drop-dist)) rotate(9deg); }
+  84%  { transform: translateY(calc(var(--vm-drop-dist) - 9px)) rotate(5deg); }
+  100% { transform: translateY(var(--vm-drop-dist)) rotate(7deg); }
+}
+
+@keyframes vm-sway {
+  0%, 100% { transform: rotate(0deg); }
+  50%      { transform: rotate(2.6deg); }
+}
