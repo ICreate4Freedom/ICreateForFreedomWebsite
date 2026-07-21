@@ -101,7 +101,7 @@ export default function VendingMachine() {
       <svg
         viewBox="-480 0 1440 680"
         preserveAspectRatio="xMidYMid slice"
-        className="h-full w-full"
+        className="vm-scene h-full w-full"
         aria-label="ICreate4Freedom navigation — a vending machine reclaimed by plants; each button vends a page"
       >
         <defs>

@@ -1,13 +1,15 @@
 /* Acid-graphics pass from the moodboard's ANK poster: red spec tags with
    leader lines, machine-vision bounding boxes, crosshair registration marks.
-   Pure decor — the parent group disables pointer events. ".vm-wide-only"
-   hides the machine's own tag on narrow screens, where the scene is cropped
-   to just the machine and the tag would dangle off-frame. */
+   Pure decor — the parent group disables pointer events. ".vm-annotations"
+   rests the whole layer at low opacity and wakes it while the cursor is in
+   the scene (vending-machine.css). ".vm-wide-only" hides the machine's own
+   tag on narrow screens, where the scene is cropped to just the machine and
+   the tag would dangle off-frame. */
 const MONO = "ui-monospace, monospace";
 
 export function Annotations() {
   return (
-    <g fontFamily={MONO}>
+    <g fontFamily={MONO} className="vm-annotations">
       {/* crosshair registration marks */}
       {[[-380, 110], [-150, 640], [520, 80], [900, 300], [790, 640]].map(([x, y], i) => (
         <g key={i} stroke="#fff" strokeWidth="1" opacity="0.35">
@@ -43,7 +45,6 @@ export function Annotations() {
         <text x="489" y="141.5" textAnchor="middle" fontSize="7.5" fill="#fff">自販機 VND-01</text>
         <path d="M446,138 L410,152 L396,158" fill="none" stroke="#b3231d" strokeWidth="1" />
         <rect x="394" y="156" width="3" height="3" fill="#b3231d" />
-        <text x="448" y="156" fontSize="6" fill="#fff" opacity="0.5">IRL content&gt;&gt;&gt;</text>
       </g>
     </g>
   );

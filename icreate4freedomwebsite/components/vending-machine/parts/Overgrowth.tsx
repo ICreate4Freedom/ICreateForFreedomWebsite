@@ -15,6 +15,9 @@ export function Overgrowth() {
       <Fatsia x={440} y={380} size={70} rotate={230} fill="#2f5e33" />
       <Fatsia x={420} y={540} size={62} rotate={318} fill="#356b3a" />
       <Fatsia x={392} y={470} size={48} rotate={280} fill="#4b8a4f" />
+      {/* moss at the machine's foot — on the ground plane, not on the base */}
+      <ellipse cx="150" cy="619" rx="26" ry="5" fill="#3f5a34" opacity="0.7" />
+      <path d="M128,621 l3,-12 l3,12 l4,-9 l4,9 l4,-11 l4,11" fill="none" stroke="#3f5a34" strokeWidth="2" strokeLinecap="round" />
       <path d="M386,600 C394,520 374,470 388,400 C398,346 380,300 388,252" fill="none" stroke="#2f5e33" strokeWidth="4" strokeLinecap="round" />
       {[[384, 560], [390, 470], [382, 380], [390, 300]].map(([x, y], i) => (
         <Fatsia key={i} x={x} y={y} size={26} rotate={i % 2 ? 300 : 60} fill="#356b3a" />
