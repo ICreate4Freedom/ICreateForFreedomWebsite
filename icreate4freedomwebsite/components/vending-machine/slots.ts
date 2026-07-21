@@ -5,6 +5,17 @@
   route metadata, sitemaps).
 */
 
+/** Dusk-room palette a slot's page renders in — the can's color as the
+    light source in a dark room. Hand-tuned; accents pass AA on their bg. */
+export interface RoomPalette {
+  bg: string;       // page background (near-black, tinted toward the can)
+  surface: string;  // cards / raised panels
+  line: string;     // hairlines and borders
+  accent: string;   // links, highlights (lightened can color)
+  text: string;     // body text
+  muted: string;    // secondary text, tags
+}
+
 export interface Slot {
   id: string;       // stable key, also shown on the selection button
   label: string;    // text printed on the cans
@@ -16,13 +27,18 @@ export interface Slot {
   can: string;      // can body color
   canDark: string;  // can shading color
   text: string;     // can label color
+  room: RoomPalette;
 }
 
 export const SLOTS: Slot[] = [
-  { id: "about",    label: "ME",   route: "/about",    price: 100, shelf: 0, x: 112, count: 3, can: "#e9e7df", canDark: "#b7b2a4", text: "#4a463e" },
-  { id: "projects", label: "DEV",  route: "/projects", price: 120, shelf: 0, x: 210, count: 3, can: "#2e6fb7", canDark: "#1d4a7e", text: "#eaf2fb" },
-  { id: "garden",   label: "GROW", route: "/garden",   price: 110, shelf: 1, x: 114, count: 7, can: "#3f7d44", canDark: "#2a5530", text: "#e9f5ea" },
-  { id: "writing",  label: "INK",  route: "/writing",  price: 130, shelf: 2, x: 114, count: 7, can: "#c8651c", canDark: "#93481a", text: "#fdf0e3" },
+  { id: "about",    label: "ME",   route: "/about",    price: 100, shelf: 0, x: 112, count: 3, can: "#e9e7df", canDark: "#b7b2a4", text: "#4a463e",
+    room: { bg: "#171610", surface: "#201e16", line: "#38352a", accent: "#e9e7df", text: "#ece9dd", muted: "#9c968a" } },
+  { id: "projects", label: "DEV",  route: "/projects", price: 120, shelf: 0, x: 210, count: 3, can: "#2e6fb7", canDark: "#1d4a7e", text: "#eaf2fb",
+    room: { bg: "#0d1521", surface: "#131e2e", line: "#263850", accent: "#6da7e0", text: "#e8f0f8", muted: "#8fa5bc" } },
+  { id: "garden",   label: "GROW", route: "/garden",   price: 110, shelf: 1, x: 114, count: 7, can: "#3f7d44", canDark: "#2a5530", text: "#e9f5ea",
+    room: { bg: "#0e1a11", surface: "#152418", line: "#2a4030", accent: "#79b97f", text: "#e9f5ea", muted: "#8fa894" } },
+  { id: "writing",  label: "INK",  route: "/writing",  price: 130, shelf: 2, x: 114, count: 7, can: "#c8651c", canDark: "#93481a", text: "#fdf0e3",
+    room: { bg: "#1a120a", surface: "#261a0f", line: "#453222", accent: "#e09554", text: "#f7ece1", muted: "#b39a85" } },
 ];
 
 /** "about" → "About" — accessible name for a slot's link */
