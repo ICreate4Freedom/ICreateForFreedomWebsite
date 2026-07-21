@@ -95,7 +95,7 @@ export default function VendingMachine() {
   const dropDist = dispensing ? DROP_LAND_Y - SHELF_CAN_Y[dispensing.shelf] : 0;
 
   return (
-    <div className="h-[calc(100dvh-2.5rem)] w-full overflow-hidden select-none bg-[#17100a]">
+    <div className="h-[calc(100dvh-2.5rem)] w-full overflow-hidden select-none bg-[#08090e]">
       {/* wide viewBox: machine stays at 0..480, alley extends to the sides;
           "slice" fills the viewport — narrow screens crop to the machine */}
       <svg
@@ -163,7 +163,7 @@ export default function VendingMachine() {
 
           {/* arrival shade: the alley starts dim and breathes open */}
           {arriving && (
-            <rect x="-480" y="0" width="1440" height="680" fill="#17100a"
+            <rect x="-480" y="0" width="1440" height="680" fill="#08090e"
               className="vm-arrive-shade" style={{ pointerEvents: "none" }} />
           )}
         </g>

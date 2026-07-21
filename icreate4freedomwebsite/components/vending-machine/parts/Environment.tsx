@@ -1,287 +1,328 @@
 import { Fatsia } from "./Fatsia";
 
-/* Golden-hour Japanese side street, spanning the full wide viewBox
-   (-480..960). Layers back→front: sunset sky, sun glow in the gap between
-   buildings, far roof silhouettes, then the near structures — a low house
-   with a lit window and izakaya lantern on the left, a concrete-block wall
-   with hedge overflow behind the machine, and on the right a second wall,
-   the sunset gap (the payphone pole silhouettes against it), and a corner
-   facade. Street floor: asphalt, curb, drain, manhole. Narrow screens crop
-   to the machine: sky + roofline + block wall stay visible behind it. */
+/* --- small storefront helpers ------------------------------------------ */
+
+/* Corrugated roller shutter (シャッター) — the closed-shop texture. */
+function Shutter({ x, y, w, h }: { x: number; y: number; w: number; h: number }) {
+  const rows = Math.max(1, Math.floor(h / 7));
+  return (
+    <g>
+      <rect x={x} y={y} width={w} height={h} fill="#191b1d" />
+      {Array.from({ length: rows }).map((_, i) => (
+        <rect key={i} x={x} y={y + i * 7} width={w} height="3.5" fill="#23272a" opacity="0.9" />
+      ))}
+      <rect x={x} y={y + h - 7} width={w} height="7" rx="1" fill="#0e1012" />
+    </g>
+  );
+}
+
+/* A tapered plant pot; `lit` warms the machine-facing side. */
+function Pot({ x, y, w, h, body, rim, lit = false }: { x: number; y: number; w: number; h: number; body: string; rim: string; lit?: boolean }) {
+  const inset = h * 0.16;
+  return (
+    <g>
+      <path d={`M${x},${y} L${x + w},${y} L${x + w - inset},${y + h} L${x + inset},${y + h} Z`} fill={body} />
+      {lit && <path d={`M${x},${y} L${x + w * 0.4},${y} L${x + w * 0.4 - inset},${y + h} L${x + inset},${y + h} Z`} fill="#000" opacity="0.28" />}
+      <rect x={x - 2.5} y={y - 4} width={w + 5} height="6" rx="1.5" fill={rim} />
+    </g>
+  );
+}
+
+/* Wall-mounted meter box on the café's side wall. */
+function MeterBox({ x, y }: { x: number; y: number }) {
+  return (
+    <g>
+      <rect x={x} y={y} width="24" height="18" rx="1" fill="#15171a" stroke="#0b0d0f" strokeWidth="1" />
+      <rect x={x + 3} y={y + 4} width="11" height="6" fill="#2b2f33" />
+      <circle cx={x + 19} cy={y + 6} r="2" fill="#33393f" />
+    </g>
+  );
+}
+
+/* A dim, distant office/skyline window; `lit` gives it a quiet glow. */
+function Win({ x, y, w = 22, h = 26, lit = false, warm = false }: { x: number; y: number; w?: number; h?: number; lit?: boolean; warm?: boolean }) {
+  return (
+    <rect x={x} y={y} width={w} height={h}
+      fill={lit ? (warm ? "#a8814a" : "#5f757e") : "#141a1e"}
+      stroke="#0f1214" strokeWidth="1.5" opacity={lit ? 0.85 : 1} />
+  );
+}
+
+/* --- the scene --------------------------------------------------------- */
+
+/* A quiet night nook: the vending machine is the one bright thing — the star
+   — nestled against a simple closed café and half-embraced by potted plants.
+   Everything else recedes into supporting shadow: a roller-shuttered neighbour
+   on the left, and on the right the alley opens onto a dark city skyline with
+   a small, dim phone booth set back down the lane (Payphone.tsx). Narrow
+   screens crop to the machine, its awning, and the nearest plants. */
 export function EnvironmentBack() {
   return (
     <g>
       <defs>
-        <linearGradient id="vm-sky" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#3d4462" />
-          <stop offset="0.45" stopColor="#7a5470" />
-          <stop offset="0.7" stopColor="#c96f52" />
-          <stop offset="0.88" stopColor="#eda05f" />
-          <stop offset="1" stopColor="#f7c97e" />
+        <linearGradient id="vm-nightsky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#080912" />
+          <stop offset="0.55" stopColor="#12101c" />
+          <stop offset="1" stopColor="#201925" />
         </linearGradient>
-        <radialGradient id="vm-sun" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" stopColor="#fff3c4" stopOpacity="0.95" />
-          <stop offset="0.3" stopColor="#ffd98e" stopOpacity="0.7" />
-          <stop offset="0.65" stopColor="#f2a65a" stopOpacity="0.28" />
-          <stop offset="1" stopColor="#f2a65a" stopOpacity="0" />
+        <radialGradient id="vm-halo" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#ffeccb" stopOpacity="0.32" />
+          <stop offset="0.45" stopColor="#f2dcb4" stopOpacity="0.12" />
+          <stop offset="1" stopColor="#f2dcb4" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="vm-winglow" cx="0.5" cy="0.45" r="0.6">
+          <stop offset="0" stopColor="#c99a58" stopOpacity="0.7" />
+          <stop offset="1" stopColor="#a06f38" stopOpacity="0" />
         </radialGradient>
       </defs>
 
-      {/* sky + sun pouring through the gap in the right block */}
-      <rect x="-480" y="0" width="1440" height="420" fill="url(#vm-sky)" />
-      <circle cx="615" cy="250" r="150" fill="url(#vm-sun)" />
-      <circle cx="615" cy="250" r="22" fill="#fff6d8" opacity="0.85" />
+      {/* deep night sky — a sliver above the shopfront, open over the city */}
+      <rect x="-480" y="0" width="1440" height="620" fill="url(#vm-nightsky)" />
+      <ellipse cx="120" cy="90" rx="520" ry="80" fill="#33263a" opacity="0.18" />
+      <ellipse cx="740" cy="340" rx="360" ry="240" fill="#241c2c" opacity="0.35" />
 
-      {/* thin evening clouds, lit from below */}
-      {[[-300, 70, 380], [250, 40, 390], [700, 100, 240]].map(([x, y, w], i) => (
-        <g key={i}>
-          <rect x={x} y={y} width={w} height="20" rx="10" fill="#554058" opacity="0.8" />
-          <rect x={x + 14} y={y + 16} width={w - 28} height="4" rx="2" fill="#e09468" opacity="0.5" />
+      {/* upper-left alley gap: distant rooftops */}
+      <path d="M-480,150 L-480,64 L-392,64 L-392,120 L-300,120 L-300,88 L-232,88 L-232,150 Z" fill="#0d0e16" />
+      {[[-452, 84, true], [-360, 100, false], [-274, 106, true]].map(([x, y, lit], i) => (
+        <rect key={i} x={x as number} y={y as number} width="8" height="10" fill={lit ? "#c99a58" : "#171a24"} opacity={lit ? 0.6 : 1} />
+      ))}
+
+      {/* ========= RIGHT: a Japanese alley opening onto the night city ====== */}
+      {/* far layered skyline silhouettes with a few scattered lights */}
+      <path d="M812,600 L812,138 L856,138 L856,100 L900,100 L900,156 L960,156 L960,600 Z" fill="#0f141b" />
+      <rect x="912" y="58" width="34" height="542" fill="#0c1016" />
+      {[[820, 158, true], [840, 210, false], [864, 124, false], [868, 200, true], [918, 110, false], [918, 220, true], [938, 160, false]].map(([x, y, lit], i) => (
+        <rect key={`fw${i}`} x={x as number} y={y as number} width="7" height="9" fill={lit ? "#b89a5e" : "#141a20"} opacity={lit ? 0.55 : 1} />
+      ))}
+
+      {/* a mid building across a side street, receding, with dim windows */}
+      <rect x="512" y="196" width="224" height="404" fill="#11161c" />
+      <g stroke="#0c1116" strokeWidth="1" opacity="0.6">
+        {[250, 310, 370, 430].map((y) => <line key={y} x1="512" y1={y} x2="736" y2={y} />)}
+      </g>
+      {([[528, 230, false], [600, 232, true], [672, 230, false], [560, 300, true], [690, 362, false]] as [number, number, boolean][]).map(([x, y, lit], i) => (
+        <Win key={`sb${i}`} x={x} y={y} w={20} h={24} lit={lit} />
+      ))}
+      {/* dim warm glow of shops from the far end of the side street */}
+      <ellipse cx="624" cy="596" rx="150" ry="66" fill="#a06f38" opacity="0.1" />
+      {[[560, 556, false], [600, 552, true], [648, 558, false], [688, 552, true]].map(([x, y, warm], i) => (
+        <rect key={`ss${i}`} x={x as number} y={y as number} width="16" height="7" rx="1" fill={warm ? "#d99a4e" : "#b8443a"} opacity="0.3" />
+      ))}
+
+      {/* the office tower — dark and quiet, receding, not competing */}
+      <rect x="736" y="120" width="212" height="480" fill="#1b221d" />
+      <rect x="736" y="120" width="212" height="6" fill="#252e27" />
+      <g stroke="#141a16" strokeWidth="2" opacity="0.7">
+        {[168, 216, 264, 312, 360, 408, 456].map((y) => <line key={y} x1="736" y1={y} x2="948" y2={y} />)}
+      </g>
+      {/* a sparse scatter of dim lit windows among the dark */}
+      {Array.from({ length: 6 }).flatMap((_, c) =>
+        Array.from({ length: 7 }).map((_, r) => {
+          const x = 748 + c * 32;
+          const y = 138 + r * 48;
+          const lit = (c * 5 + r * 3) % 5 === 0;
+          const warm = (c + r) % 2 === 0;
+          return (
+            <rect key={`ow${c}-${r}`} x={x} y={y} width="18" height="26"
+              fill={lit ? (warm ? "#9a7742" : "#566a72") : "#0f1418"} opacity={lit ? 0.7 : 1} />
+          );
+        })
+      )}
+      {/* red aviation warning lights down the tower's corner (atmospheric) */}
+      {[150, 216, 282, 348, 414, 480].map((y) => (
+        <g key={y}>
+          <circle cx={740} cy={y} r="4" fill="#d63328" opacity="0.22" />
+          <circle cx={740} cy={y} r="1.6" fill="#e85446" />
         </g>
       ))}
-      {/* distant birds heading home */}
-      <path d="M424,130 Q430,125 436,130 M464,146 Q470,141 476,146" fill="none" stroke="#241c26" strokeWidth="1.8" strokeLinecap="round" />
+      {/* rooftop water tank + antenna */}
+      <rect x="856" y="98" width="40" height="22" rx="2" fill="#161d18" />
+      {[862, 872, 882, 890].map((x) => <line key={x} x1={x} y1="98" x2={x} y2="120" stroke="#0d1210" strokeWidth="1" />)}
+      <line x1="908" y1="120" x2="908" y2="82" stroke="#101613" strokeWidth="2" />
+      <circle cx="908" cy="82" r="1.8" fill="#e85446" />
 
-      {/* far roofline silhouettes (dip low inside the sunset gap) */}
-      <path d="M-480,330 L-480,262 L-320,262 L-320,236 L-236,236 L-236,270 L-88,270 L-88,248 L40,248 L40,268 L240,268 L240,252 L430,252 L430,280 L560,280 L560,356 L610,356 L610,344 L680,344 L680,240 L800,240 L800,262 L960,262 L960,330 Z"
-        fill="#241c26" />
-      {/* tiny far utility pole inside the gap */}
-      <g stroke="#241c26" strokeWidth="3">
-        <line x1="612" y1="300" x2="612" y2="390" />
-        <line x1="602" y1="312" x2="622" y2="312" />
-      </g>
+      {/* the faint glow of shops across the way, low in the gap */}
+      <ellipse cx="620" cy="600" rx="200" ry="90" fill="#a06f38" opacity="0.09" />
 
-      {/* ===== left house: roof, eave, plaster + slat siding ===== */}
-      <rect x="-480" y="200" width="428" height="28" fill="#322833" />
-      <line x1="-480" y1="200" x2="-52" y2="200" stroke="#e8935a" strokeWidth="2" opacity="0.8" />
-      <rect x="-480" y="228" width="428" height="18" fill="#241d22" />
-      <rect x="-480" y="246" width="428" height="354" fill="#4a3f36" />
-      {Array.from({ length: 26 }).map((_, i) => (
-        <rect key={i} x={-478 + i * 16} y="462" width="13" height="136" fill={i % 2 ? "#3a2f28" : "#362b24"} />
-      ))}
-      <rect x="-480" y="454" width="428" height="8" fill="#2f2620" />
-      {/* unlit window, then the lit frosted one */}
-      <rect x="-430" y="300" width="50" height="68" fill="#241f22" stroke="#2a2126" strokeWidth="3" />
-      <ellipse cx="-268" cy="334" rx="58" ry="42" fill="#ffce7e" opacity="0.15" />
-      <rect x="-298" y="302" width="60" height="64" fill="#ffd9a0" opacity="0.9" />
-      <g stroke="#2a2126" strokeWidth="3" fill="none">
-        <rect x="-302" y="298" width="68" height="72" />
-        <line x1="-268" y1="298" x2="-268" y2="370" />
-        <line x1="-302" y1="334" x2="-234" y2="334" />
-      </g>
-      {/* izakaya lantern under the eave */}
-      <line x1="-160" y1="246" x2="-160" y2="260" stroke="#2a2126" strokeWidth="2.5" />
-      <ellipse cx="-160" cy="288" rx="34" ry="40" fill="#ff8c42" opacity="0.16" />
-      <rect x="-170" y="258" width="20" height="7" rx="2" fill="#222" />
-      <ellipse cx="-160" cy="288" rx="17" ry="24" fill="#e2571f" />
-      <ellipse cx="-160" cy="288" rx="17" ry="24" fill="#ff8c42" opacity="0.45" />
-      {[-14, -5, 4, 13].map((dy) => (
-        <ellipse key={dy} cx="-160" cy={288 + dy} rx={17 * Math.sqrt(1 - (dy / 24) ** 2)} ry="1.8"
-          fill="none" stroke="#a53c12" strokeWidth="1" opacity="0.7" />
-      ))}
-      <rect x="-168" y="310" width="16" height="6" rx="2" fill="#222" />
+      {/* ===== LEFT: shuttered neighbour the CRT pile leans against ===== */}
+      <rect x="-480" y="150" width="516" height="450" fill="#131417" />
+      <Shutter x={-440} y={168} w={470} h={432} />
+      <rect x="28" y="150" width="10" height="450" fill="#0a0c0e" />
+      <rect x="38" y="150" width="3" height="450" fill="#2c2620" opacity="0.55" />
 
-      {/* ===== center: concrete-block wall behind the machine ===== */}
-      {/* far house behind the wall */}
-      <rect x="40" y="268" width="390" height="66" fill="#241c26" />
-      <rect x="-20" y="330" width="490" height="270" fill="#4e4a42" />
-      <rect x="-20" y="330" width="490" height="12" fill="#5a564e" />
-      <line x1="-20" y1="330" x2="470" y2="330" stroke="#d98a63" strokeWidth="1.5" opacity="0.5" />
-      <g stroke="#423e37" strokeWidth="1" opacity="0.6">
-        {[372, 414, 456, 498, 540, 582].map((y) => <line key={y} x1="-20" y1={y} x2="470" y2={y} />)}
-        {Array.from({ length: 12 }).map((_, i) => (
-          <line key={`v${i}`} x1={20 + i * 40} y1="342" x2={20 + i * 40} y2="600" />
+      {/* ===== CENTER: the simple café the machine belongs to ===== */}
+      <rect x="42" y="80" width="430" height="540" fill="#16130e" />
+      {/* hard right corner: a shadowed side-wall so the café keeps its own
+          mass against the city, with a couple of quiet meters on it */}
+      <rect x="472" y="120" width="26" height="500" fill="#0b0906" />
+      <rect x="470" y="120" width="3" height="500" fill="#382d20" opacity="0.6" />
+      <rect x="482" y="150" width="7" height="470" fill="#0d0b07" />
+      {[220, 360].map((y) => <MeterBox key={y} x={476} y={y} />)}
+
+      {/* a dim warm café window beside the machine — soft ambient, not a
+          second bright light */}
+      <ellipse cx="436" cy="380" rx="52" ry="90" fill="url(#vm-winglow)" opacity="0.5" />
+      <rect x="410" y="330" width="52" height="118" rx="2" fill="#8a6836" opacity="0.55" />
+      <rect x="410" y="330" width="52" height="118" rx="2" fill="none" stroke="#0f0c08" strokeWidth="3" />
+      <line x1="436" y1="330" x2="436" y2="448" stroke="#0f0c08" strokeWidth="1.25" />
+      <line x1="410" y1="389" x2="462" y2="389" stroke="#0f0c08" strokeWidth="1.25" />
+
+      {/* backlit nameplate — quiet, one line */}
+      <rect x="86" y="20" width="336" height="30" rx="2" fill="#14110b" stroke="#241b12" strokeWidth="1.5" />
+      <text x="254" y="41" textAnchor="middle" fontFamily="ui-serif, Georgia, serif" fontStyle="italic" fontSize="16" fill="#c9a06a" opacity="0.62">
+        café ICREATE
+      </text>
+
+      {/* simple striped awning with a clean straight edge */}
+      <g>
+        <rect x="52" y="54" width="404" height="24" fill="#1a120d" />
+        {Array.from({ length: 13 }).map((_, i) => (
+          <rect key={i} x={52 + i * 31} y="54" width="15" height="24" fill={i % 2 ? "#5a2620" : "#3a322a"} opacity="0.75" />
         ))}
-      </g>
-      {/* hedge spilling over the wall cap */}
-      <Fatsia x={10} y={332} size={44} rotate={196} fill="#2f5e33" sway />
-      <Fatsia x={64} y={324} size={38} rotate={352} fill="#3c7a41" />
-      <Fatsia x={150} y={330} size={42} rotate={188} fill="#356b3a" />
-      <Fatsia x={255} y={322} size={36} rotate={8} fill="#2f5e33" />
-      <Fatsia x={352} y={330} size={40} rotate={196} fill="#3c7a41" sway />
-      <Fatsia x={432} y={326} size={44} rotate={350} fill="#356b3a" />
-      {/* garden tree leaning out from behind the wall */}
-      <path d="M-52,332 C-46,290 -60,240 -44,196 C-34,166 -46,140 -34,116 L-16,116 C-26,150 -12,178 -24,214 C-36,258 -20,296 -30,332 Z"
-        fill="#3d2e24" stroke="#2b2019" strokeWidth="2" />
-      <g>
-        <ellipse cx="-64" cy="128" rx="58" ry="34" fill="#3c5a35" />
-        <ellipse cx="8" cy="96" rx="64" ry="36" fill="#46683c" />
-        <ellipse cx="-24" cy="70" rx="48" ry="28" fill="#3c5a35" />
-        <path d="M56,74 C68,84 72,100 66,114" fill="none" stroke="#c9a24a" strokeWidth="3" opacity="0.7" strokeLinecap="round" />
-        <path d="M-66,52 C-50,42 -28,40 -10,46" fill="none" stroke="#c9a24a" strokeWidth="2.5" opacity="0.55" strokeLinecap="round" />
+        <rect x="52" y="52" width="404" height="4" fill="#241a14" />
+        <rect x="52" y="78" width="404" height="4" fill="#120c08" />
       </g>
 
-      {/* ===== right: wall segment, sunset gap, corner facade ===== */}
-      <rect x="470" y="330" width="90" height="270" fill="#4e4a42" />
-      <rect x="470" y="330" width="90" height="12" fill="#5a564e" />
-      <g stroke="#423e37" strokeWidth="1" opacity="0.6">
-        {[372, 414, 456, 498, 540, 582].map((y) => <line key={y} x1="470" y1={y} x2="560" y2={y} />)}
-        {[500, 540].map((x) => <line key={x} x1={x} y1="342" x2={x} y2="600" />)}
-      </g>
-      {/* light spilling from the gap across the asphalt */}
-      <polygon points="566,600 674,600 762,680 484,680" fill="#f2a65a" opacity="0.12" />
-      {/* corner facade */}
-      <rect x="680" y="190" width="280" height="30" fill="#322833" />
-      <line x1="680" y1="190" x2="960" y2="190" stroke="#e8935a" strokeWidth="2" opacity="0.8" />
-      <rect x="680" y="220" width="280" height="380" fill="#43382f" />
-      <rect x="680" y="220" width="7" height="380" fill="#241d22" />
-      <rect x="760" y="300" width="56" height="68" fill="#241f22" stroke="#2a2126" strokeWidth="3" />
+      {/* the machine's glow on the wall behind it — the beacon */}
+      <ellipse cx="240" cy="330" rx="330" ry="370" fill="url(#vm-halo)" />
 
-      {/* pixel-moss: glitch tiles creeping across the walls */}
-      {[[-372, 410], [-350, 452], [-180, 500], [90, 430], [230, 384], [724, 300], [762, 342]].map(([x, y], i) => (
-        <g key={`px${i}`} fill="#2c4a2e" opacity="0.55">
-          <rect x={x} y={y} width="10" height="10" />
-          <rect x={x + 12} y={y + 4} width="8" height="8" opacity="0.7" />
-          <rect x={x - 6} y={y + 12} width="7" height="7" opacity="0.5" />
-          <rect x={x + 6} y={y + 14} width="9" height="9" opacity="0.8" />
+      {/* a single drain pipe on the shop wall left of the machine */}
+      <rect x="70" y="80" width="9" height="520" fill="#14110c" />
+      {[200, 380].map((y) => <rect key={y} x="67" y={y} width="15" height="5" rx="1.5" fill="#241d15" />)}
+
+      {/* a little pixel-moss, kept faint */}
+      {[[-330, 500], [-150, 490], [486, 420]].map(([x, y], i) => (
+        <g key={`px${i}`} fill="#2c4a2e" opacity="0.4">
+          <rect x={x} y={y} width="9" height="9" />
+          <rect x={x + 11} y={y + 4} width="7" height="7" opacity="0.7" />
+          <rect x={x + 5} y={y + 13} width="8" height="8" opacity="0.8" />
         </g>
       ))}
 
-      {/* power lines sagging across the alley, dark against the sky */}
-      <g stroke="#17131a" strokeWidth="2.5" fill="none" opacity="0.9">
-        <path d="M-480,96 C-160,140 300,150 656,152" />
-        <path d="M-480,116 C-140,158 320,164 658,158" />
-        <path d="M672,152 C780,138 880,118 960,104" />
-        <path d="M672,158 C790,148 890,132 960,120" />
-        <path d="M-60,205 C220,176 460,162 656,150" />
+      {/* a few overhead wires crossing the alley, dark against the sky */}
+      <g stroke="#0a0810" strokeWidth="2.5" fill="none" opacity="0.85">
+        <path d="M-480,80 C-160,130 300,128 520,110" />
+        <path d="M-40,150 C220,122 440,112 520,116" />
+        <path d="M520,110 C660,102 820,124 960,152" />
       </g>
 
-      {/* beverage crates stacked beside the machine */}
-      <g>
-        <rect x="20" y="540" width="56" height="28" rx="2" fill="#2e5a8a" stroke="#1d3f66" strokeWidth="1.5" />
-        {[34, 48, 62].map((x) => <rect key={x} x={x} y="546" width="8" height="16" rx="1" fill="#1d3f66" opacity="0.6" />)}
-        <rect x="20" y="570" width="56" height="28" rx="2" fill="#a83c32" stroke="#7c2b24" strokeWidth="1.5" />
-        {[34, 48, 62].map((x) => <rect key={x} x={x} y="576" width="8" height="16" rx="1" fill="#7c2b24" opacity="0.6" />)}
-        <rect x="84" y="570" width="48" height="28" rx="2" fill="#a83c32" stroke="#7c2b24" strokeWidth="1.5" />
-        {[96, 110].map((x) => <rect key={x} x={x} y="576" width="8" height="16" rx="1" fill="#7c2b24" opacity="0.6" />)}
-      </g>
+      {/* ===== the potted-plant nest, left of the machine ===== */}
+      <path d="M48,600 C40,520 58,470 46,404 C40,360 56,300 46,236 C42,196 70,150 120,116 C170,84 240,92 300,104"
+        fill="none" stroke="#241a12" strokeWidth="5" strokeLinecap="round" />
+      <path d="M46,300 C24,262 14,232 22,206" fill="none" stroke="#241a12" strokeWidth="3" strokeLinecap="round" />
+      <rect x="-6" y="556" width="96" height="46" fill="#2a2926" stroke="#171613" strokeWidth="1.5" />
+      {[22, 50].map((x) => <rect key={x} x={x} y="562" width="16" height="34" rx="1" fill="#1c1b18" opacity="0.6" />)}
+      <Pot x={-14} y={520} w={40} h={40} body="#7a4028" rim="#8f4d31" lit />
+      <Pot x={34} y={524} w={44} h={40} body="#3f4a5e" rim="#4a5670" lit />
+      <Pot x={70} y={544} w={34} h={34} body="#b7ac96" rim="#c6bca6" lit />
+      <Pot x={6} y={560} w={50} h={44} body="#8a5636" rim="#9c6440" lit />
+      <Pot x={58} y={568} w={40} h={38} body="#41506e" rim="#c8d0dc" lit />
+      <Fatsia x={12} y={520} size={64} rotate={198} fill="#22482a" sway />
+      <Fatsia x={62} y={512} size={54} rotate={344} fill="#2f5e33" />
+      <Fatsia x={-8} y={540} size={48} rotate={176} fill="#356b3a" sway />
+      <Fatsia x={96} y={548} size={44} rotate={20} fill="#27522b" />
+      <Fatsia x={40} y={556} size={40} rotate={300} fill="#3c7a41" />
+      <Fatsia x={40} y={300} size={34} rotate={250} fill="#2f5e33" />
+      <Fatsia x={34} y={214} size={30} rotate={214} fill="#356b3a" />
+      <Fatsia x={92} y={150} size={40} rotate={196} fill="#3c7a41" sway />
+      <Fatsia x={168} y={112} size={44} rotate={172} fill="#2f5e33" sway />
+      <Fatsia x={244} y={104} size={38} rotate={158} fill="#356b3a" />
+      <Fatsia x={80} y={540} size={30} rotate={12} fill="#4b8a4f" />
 
-      {/* convex traffic mirror catching the sun */}
-      <g>
-        <rect x="807" y="318" width="6" height="284" rx="3" fill="#3b3630" stroke="#2a2622" strokeWidth="1" />
-        <line x1="810" y1="318" x2="810" y2="304" stroke="#2a2622" strokeWidth="3" />
-        <circle cx="810" cy="286" r="27" fill="#d96b2f" />
-        <circle cx="810" cy="286" r="21" fill="#9fb3bd" />
-        <ellipse cx="817" cy="280" rx="8" ry="5" fill="#f7c97e" opacity="0.8" />
-      </g>
-
-      {/* ===== street floor ===== */}
-      <rect x="-480" y="600" width="1440" height="80" fill="#262019" />
-      <rect x="-480" y="596" width="1440" height="7" fill="#4e4840" opacity="0.55" />
-      <line x1="-480" y1="608" x2="960" y2="608" stroke="#17130f" strokeWidth="2" opacity="0.8" />
-      {[-440, -350, -260, -170, 10, 440, 530, 700, 790, 880].map((x) => (
-        <rect key={x} x={x} y="604" width="26" height="7" rx="1.5" fill="#17130f" opacity="0.9" />
+      {/* ===== street floor: raised tiled plinth + road ===== */}
+      <rect x="-480" y="600" width="1440" height="80" fill="#100d08" />
+      <rect x="40" y="600" width="452" height="20" fill="#211d16" />
+      <rect x="40" y="600" width="452" height="4" fill="#322b20" opacity="0.7" />
+      <rect x="40" y="618" width="452" height="4" fill="#000" opacity="0.5" />
+      <line x1="-480" y1="626" x2="960" y2="626" stroke="#0a0805" strokeWidth="2" opacity="0.8" />
+      {[-360, -250, 300, 780].map((x) => (
+        <rect key={x} x={x} y="632" width="30" height="8" rx="1.5" fill="#0a0805" opacity="0.9" />
       ))}
-      <ellipse cx="-20" cy="646" rx="24" ry="8" fill="#1c1814" stroke="#3a332b" strokeWidth="1.5" />
-      <ellipse cx="-20" cy="646" rx="14" ry="4.5" fill="none" stroke="#3a332b" strokeWidth="1" opacity="0.7" />
-      <ellipse cx="240" cy="614" rx="190" ry="16" fill="#000" opacity="0.45" />
-      {/* weeds at the wall bases */}
-      {[[-420, 610, 30, 7], [-90, 612, 26, 6], [246, 614, 30, 7], [500, 610, 28, 6], [742, 612, 30, 7]].map(([x, y, rx, ry], i) => (
-        <ellipse key={i} cx={x} cy={y} rx={rx} ry={ry} fill="#4a5a34" opacity="0.55" />
+      <ellipse cx="150" cy="656" rx="26" ry="8" fill="#151009" stroke="#2e281f" strokeWidth="1.5" />
+      <ellipse cx="150" cy="656" rx="15" ry="4.5" fill="none" stroke="#2e281f" strokeWidth="1" opacity="0.6" />
+      <ellipse cx="240" cy="618" rx="188" ry="14" fill="#000" opacity="0.5" />
+      {[[-410, 622, 26, 6], [470, 620, 22, 6]].map(([x, y, rx, ry], i) => (
+        <ellipse key={i} cx={x} cy={y} rx={rx} ry={ry} fill="#2c3a22" opacity="0.55" />
       ))}
     </g>
   );
 }
 
-/* "After rain" pass, drawn directly on top of the ground band: a damp warm
-   wash, the machine's lit face mirrored into the asphalt, glints under the
-   lantern / live CRT / payphone, puddles that carry the sunset, and thin
-   sheen streaks. Static — all motion stays in Atmosphere and the machine. */
+/* "After rain" pass on the road: a damp cool wash at night and the lit
+   machine mirrored into the wet asphalt — the star's reflection. Quiet
+   elsewhere. Static. */
 export function WetGround() {
   return (
     <g style={{ pointerEvents: "none" }}>
       <defs>
-        {/* reflections die off quickly with distance from the object's base */}
         <linearGradient id="vm-reflFade" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#fff" stopOpacity="0.8" />
-          <stop offset="0.55" stopColor="#fff" stopOpacity="0.3" />
+          <stop offset="0" stopColor="#fff" stopOpacity="0.75" />
+          <stop offset="0.55" stopColor="#fff" stopOpacity="0.28" />
           <stop offset="1" stopColor="#fff" stopOpacity="0" />
         </linearGradient>
         <mask id="vm-reflMask">
-          <rect x="-480" y="620" width="1440" height="60" fill="url(#vm-reflFade)" />
+          <rect x="-480" y="622" width="1440" height="58" fill="url(#vm-reflFade)" />
         </mask>
       </defs>
 
-      {/* damp wash: evening warmth settling on the asphalt */}
-      <rect x="-480" y="600" width="1440" height="80" fill="#2a1620" opacity="0.14" />
+      <rect x="-480" y="622" width="1440" height="58" fill="#0e1420" opacity="0.2" />
+      <ellipse cx="240" cy="648" rx="205" ry="28" fill="#ffe0b0" opacity="0.09" />
 
-      {/* pool of light the lit machine throws on the wet ground */}
-      <ellipse cx="240" cy="642" rx="210" ry="30" fill="#ffcf9a" opacity="0.08" />
-
-      {/* the machine's face, mirrored: base sliver, blue door (wave + dark
-          dispense notch), then the cream body fading with distance */}
+      {/* the machine's lit face mirrored into the asphalt */}
       <g mask="url(#vm-reflMask)">
-        <rect x="92" y="622" width="296" height="5" rx="2" fill="#4a463e" opacity="0.7" />
-        <rect x="94" y="627" width="292" height="20" rx="3" fill="#2b7ccb" opacity="0.6" />
-        <rect x="152" y="630" width="136" height="8" rx="3" fill="#14171b" opacity="0.6" />
-        <path d="M104,641 C160,634 250,646 300,639 C336,634 366,640 386,637 L386,647 L104,647 Z" fill="#f2f5f8" opacity="0.4" />
-        <rect x="94" y="647" width="292" height="22" rx="3" fill="#e8e6de" opacity="0.55" />
-        {/* dry streaks interrupting the reflection */}
-        <rect x="80" y="634" width="320" height="2" fill="#262019" opacity="0.7" />
-        <rect x="80" y="653" width="320" height="2.5" fill="#262019" opacity="0.7" />
+        <rect x="92" y="624" width="296" height="5" rx="2" fill="#4a463e" opacity="0.65" />
+        <rect x="94" y="629" width="292" height="20" rx="3" fill="#2b7ccb" opacity="0.55" />
+        <rect x="152" y="632" width="136" height="8" rx="3" fill="#14171b" opacity="0.6" />
+        <path d="M104,643 C160,636 250,648 300,641 C336,636 366,642 386,639 L386,649 L104,649 Z" fill="#f2f5f8" opacity="0.38" />
+        <rect x="94" y="649" width="292" height="22" rx="3" fill="#e8e6de" opacity="0.5" />
+        <rect x="80" y="636" width="320" height="2" fill="#100d08" opacity="0.7" />
+        <rect x="80" y="655" width="320" height="2.5" fill="#100d08" opacity="0.7" />
       </g>
+      {/* faint warm smear from the café window */}
+      <ellipse cx="436" cy="640" rx="24" ry="8" fill="#c99a58" opacity="0.1" />
+      {/* green spill from the one CRT still alive */}
+      <ellipse cx="-258" cy="616" rx="26" ry="5" fill="#8fd694" opacity="0.11" />
 
-      {/* warm glint under the izakaya lantern */}
-      <ellipse cx="-160" cy="632" rx="8" ry="12" fill="#ff8c42" opacity="0.14" />
-      <ellipse cx="-160" cy="628" rx="4.5" ry="7" fill="#e2571f" opacity="0.16" />
-      {/* the lit window's smear */}
-      <ellipse cx="-268" cy="630" rx="20" ry="6" fill="#ffd9a0" opacity="0.1" />
-
-      {/* green spill from the one CRT still alive, and the payphone box */}
-      <ellipse cx="-258" cy="612" rx="26" ry="5" fill="#8fd694" opacity="0.12" />
-      <ellipse cx="653" cy="628" rx="18" ry="4" fill="#2f7d3f" opacity="0.12" />
-
-      {/* puddles — every one carries a little sunset; the one in the gap's
-          light gets a piece of open sky */}
+      {/* a couple of puddles, quiet */}
       {[
-        { cx: -60, cy: 650, rx: 46, ry: 7, rim: "#b07a88" },
-        { cx: -330, cy: 660, rx: 38, ry: 6.5, rim: "#b07a88" },
-        { cx: 520, cy: 644, rx: 34, ry: 6, rim: "#f2a65a" },
-        { cx: 340, cy: 660, rx: 24, ry: 5, rim: "#d9c9a8" },
+        { cx: 120, cy: 660, rx: 44, ry: 6.5, rim: "#e0a35c" },
+        { cx: -60, cy: 652, rx: 40, ry: 6.5, rim: "#5a6a86" },
+        { cx: -330, cy: 662, rx: 36, ry: 6, rim: "#5a6a86" },
       ].map(({ cx, cy, rx, ry, rim }, i) => (
         <g key={i}>
-          <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="#12181a" opacity="0.85" />
+          <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="#0d1214" opacity="0.85" />
           <path d={`M${cx - rx},${cy - 1} C${cx - rx * 0.5},${cy - ry} ${cx + rx * 0.5},${cy - ry} ${cx + rx},${cy - 1}`}
-            fill="none" stroke={rim} strokeWidth="1.5" opacity="0.3" />
+            fill="none" stroke={rim} strokeWidth="1.4" opacity="0.28" />
         </g>
       ))}
-      <ellipse cx="520" cy="644" rx="20" ry="3.5" fill="#d97b4f" opacity="0.3" />
-
-      {/* thin sheen streaks across the asphalt */}
-      {[[-420, 622, 130], [-180, 664, 170], [60, 671, 150], [420, 655, 180], [700, 640, 150], [-40, 612, 90]].map(([x, y, w], i) => (
-        <rect key={i} x={x} y={y} width={w} height="1.5" rx="0.75" fill="#ffd9a0" opacity="0.08" />
+      {[[-420, 632, 130], [-180, 668, 160], [60, 672, 150], [420, 660, 150]].map(([x, y, w], i) => (
+        <rect key={i} x={x} y={y} width={w} height="1.5" rx="0.75" fill="#ffe0b0" opacity="0.06" />
       ))}
     </g>
   );
 }
 
-/* Front-most atmosphere: golden-hour dapples + vignette over the full scene.
-   MUST stay pointer-events:none or it will swallow clicks on the machine.
-   `arriving` fades the dapples in on the first load (B1 arrival beat). */
+/* Front-most atmosphere at night: a warm beacon bloom around the machine and
+   a deep vignette pulling the edges into shadow, so the star stands alone.
+   MUST stay pointer-events:none. `arriving` fades it in on first load. */
 export function Atmosphere({ arriving = false }: { arriving?: boolean }) {
   return (
     <g style={{ pointerEvents: "none" }}>
       <defs>
         <filter id="vm-softLight" x="-40%" y="-40%" width="180%" height="180%">
-          <feGaussianBlur stdDeviation="12" />
+          <feGaussianBlur stdDeviation="14" />
         </filter>
-        <radialGradient id="vm-vignette" cx="0.5" cy="0.42" r="0.75">
-          <stop offset="0.4" stopColor="#000" stopOpacity="0" />
-          <stop offset="1" stopColor="#000" stopOpacity="0.5" />
+        <radialGradient id="vm-vignette" cx="0.5" cy="0.44" r="0.7">
+          <stop offset="0.3" stopColor="#000" stopOpacity="0" />
+          <stop offset="1" stopColor="#000" stopOpacity="0.7" />
+        </radialGradient>
+        <radialGradient id="vm-beacon" cx="0.5" cy="0.5" r="0.5">
+          <stop offset="0" stopColor="#ffe8c2" stopOpacity="0.17" />
+          <stop offset="1" stopColor="#ffe8c2" stopOpacity="0" />
         </radialGradient>
       </defs>
-      <g className={arriving ? "vm-arrive-dapples" : undefined} filter="url(#vm-softLight)" fill="#ffd9a0">
-        <ellipse cx="120" cy="120" rx="60" ry="34" opacity="0.16" />
-        <ellipse cx="290" cy="70" rx="80" ry="30" opacity="0.14" />
-        <ellipse cx="200" cy="300" rx="46" ry="70" opacity="0.10" />
-        <ellipse cx="330" cy="430" rx="54" ry="40" opacity="0.12" />
-        <ellipse cx="90" cy="500" rx="40" ry="26" opacity="0.10" />
-        <ellipse cx="-350" cy="180" rx="70" ry="36" opacity="0.10" />
-        <ellipse cx="-160" cy="90" rx="90" ry="32" opacity="0.12" />
-        <ellipse cx="-240" cy="480" rx="55" ry="40" opacity="0.09" />
-        <ellipse cx="540" cy="140" rx="80" ry="34" opacity="0.12" />
-        <ellipse cx="700" cy="420" rx="60" ry="46" opacity="0.10" />
-        <ellipse cx="860" cy="200" rx="70" ry="30" opacity="0.10" />
+      <g className={arriving ? "vm-arrive-dapples" : undefined}>
+        <ellipse cx="240" cy="340" rx="285" ry="305" fill="url(#vm-beacon)" filter="url(#vm-softLight)" />
       </g>
       <rect x="-480" width="1440" height="680" fill="url(#vm-vignette)" />
     </g>

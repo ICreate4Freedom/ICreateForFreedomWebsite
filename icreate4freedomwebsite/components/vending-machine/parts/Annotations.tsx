@@ -29,15 +29,11 @@ export function Annotations() {
       <rect x="-300" y="452" width="46" height="9" fill="#cde15a" />
       <text x="-296" y="459" fontSize="6.5" fill="#10150f">CRT 0.94</text>
 
-      {/* payphone: red tag + leader */}
-      <rect x="580" y="216" width="118" height="13" fill="#b3231d" />
-      <text x="639" y="225.5" textAnchor="middle" fontSize="7.5" fill="#fff">公衆電話 · NO SIGNAL</text>
-      <path d="M639,229 L639,262 L648,292" fill="none" stroke="#b3231d" strokeWidth="1" />
-      <rect x="646" y="290" width="3" height="3" fill="#b3231d" />
-      {/* detection box on the undergrowth at the pole's base */}
-      <rect x="604" y="558" width="94" height="66" fill="none" stroke="#cde15a" strokeWidth="1" opacity="0.85" />
-      <rect x="604" y="550" width="52" height="9" fill="#cde15a" />
-      <text x="600" y="557" dx="4" fontSize="6.5" fill="#10150f">PLANT 0.97</text>
+      {/* side-street tag: reads the city depth right of the machine */}
+      <rect x="560" y="470" width="104" height="13" fill="#b3231d" />
+      <text x="612" y="479.5" textAnchor="middle" fontSize="7.5" fill="#fff">路地 · SIDE ST</text>
+      <path d="M612,483 L612,506 L624,520" fill="none" stroke="#b3231d" strokeWidth="1" />
+      <rect x="622" y="518" width="3" height="3" fill="#b3231d" />
 
       {/* the machine itself */}
       <g className="vm-wide-only">
