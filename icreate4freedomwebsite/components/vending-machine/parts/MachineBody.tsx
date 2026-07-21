@@ -8,6 +8,8 @@ export function MachineBody() {
       {/* body + base */}
       <rect x="90" y="95" width="300" height="525" rx="8" fill="#e8e6de" stroke="#aaa494" strokeWidth="2" />
       <rect x="90" y="95" width="12" height="525" rx="6" fill="#d2cec2" />
+      {/* sunset rim light on the sun-facing edge */}
+      <rect x="386" y="98" width="3.5" height="520" rx="1.75" fill="#ffcf9a" opacity="0.28" />
       <rect x="90" y="600" width="300" height="20" rx="4" fill="#4a463e" />
 
       {/* PET bottle someone left on top */}
