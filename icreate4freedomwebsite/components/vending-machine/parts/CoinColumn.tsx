@@ -7,7 +7,7 @@ export interface LedDisplay {
   marquee?: boolean; // scroll long text across the LED (idle invitation)
 }
 
-export function CoinColumn({ display }: { display: LedDisplay }) {
+export function CoinColumn({ display, arriving = false }: { display: LedDisplay; arriving?: boolean }) {
   const long = display.text.length > 8;
   return (
     <g>
@@ -20,7 +20,7 @@ export function CoinColumn({ display }: { display: LedDisplay }) {
       <rect x="316" y="208" width="58" height="52" rx="5" fill="#f7f6f2" stroke="#c9c4b7" strokeWidth="1.5" />
       <line x1="322" y1="252" x2="368" y2="252" stroke="#c9c4b7" strokeWidth="1.5" />
       <rect x="318" y="270" width="54" height="16" rx="2" fill="#181b1f" />
-      <g clipPath="url(#vm-ledClip)">
+      <g clipPath="url(#vm-ledClip)" className={arriving ? "vm-arrive-led" : undefined}>
         {display.marquee ? (
           <text className="vm-marquee" x="318" y="281.5" fontFamily="ui-monospace, monospace" fontSize="8" fill="#7CFC00">
             {display.text}

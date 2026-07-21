@@ -19,6 +19,11 @@ const DROP_MS = 700;    // can fall duration
 const SETTLE_MS = 150;  // beat after the can lands, before the route changes
 const IDLE_MS = 6000;   // quiet time before the LED starts inviting
 
+/* B1 — the arrival beat plays once per hard load: true until the first
+   mount's effect runs, so client-side returns to the machine skip it.
+   (Server-side this is never mutated, so SSR always renders the beat.) */
+let arrivedThisLoad = false;
+
 const REDUCED_MQ = "(prefers-reduced-motion: reduce)";
 const subscribeReduced = (onChange: () => void) => {
   const mq = window.matchMedia(REDUCED_MQ);
@@ -35,6 +40,8 @@ export default function VendingMachine() {
   const reduced = useSyncExternalStore(subscribeReduced, reducedSnapshot, () => false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // captured once per mount: true only on the first mount of a hard load
+  const [arriving] = useState(() => !arrivedThisLoad);
 
   const armIdle = () => {
     if (idleTimer.current) clearTimeout(idleTimer.current);
@@ -42,6 +49,7 @@ export default function VendingMachine() {
   };
 
   useEffect(() => {
+    arrivedThisLoad = true;
     // only four pages exist — prefetch them all so touch users (who never
     // hover) get instant vends too
     SLOTS.forEach((slot) => router.prefetch(slot.route));
@@ -127,7 +135,7 @@ export default function VendingMachine() {
         ))}
 
         <g aria-hidden="true">
-          <CoinColumn display={display} />
+          <CoinColumn display={display} arriving={arriving} />
           <LowerDoor />
 
           {dispensing && (
@@ -151,7 +159,13 @@ export default function VendingMachine() {
             <Annotations />
           </g>
 
-          <Atmosphere />
+          <Atmosphere arriving={arriving} />
+
+          {/* arrival shade: the alley starts dim and breathes open */}
+          {arriving && (
+            <rect x="-480" y="0" width="1440" height="680" fill="#0b0e0b"
+              className="vm-arrive-shade" style={{ pointerEvents: "none" }} />
+          )}
         </g>
       </svg>
     </div>

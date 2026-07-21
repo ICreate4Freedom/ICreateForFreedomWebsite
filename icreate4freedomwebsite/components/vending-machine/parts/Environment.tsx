@@ -128,8 +128,9 @@ export function WetGround() {
 }
 
 /* Front-most atmosphere: dappled sunlight + vignette over the full scene.
-   MUST stay pointer-events:none or it will swallow clicks on the machine. */
-export function Atmosphere() {
+   MUST stay pointer-events:none or it will swallow clicks on the machine.
+   `arriving` fades the dapples in on the first load (B1 arrival beat). */
+export function Atmosphere({ arriving = false }: { arriving?: boolean }) {
   return (
     <g style={{ pointerEvents: "none" }}>
       <defs>
@@ -141,7 +142,7 @@ export function Atmosphere() {
           <stop offset="1" stopColor="#000" stopOpacity="0.5" />
         </radialGradient>
       </defs>
-      <g filter="url(#vm-softLight)" fill="#fff6cf">
+      <g className={arriving ? "vm-arrive-dapples" : undefined} filter="url(#vm-softLight)" fill="#fff6cf">
         <ellipse cx="120" cy="120" rx="60" ry="34" opacity="0.16" />
         <ellipse cx="290" cy="70" rx="80" ry="30" opacity="0.14" />
         <ellipse cx="200" cy="300" rx="46" ry="70" opacity="0.10" />

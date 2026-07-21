@@ -43,6 +43,45 @@
   opacity: 1;
 }
 
+/* B1 — arrival beat. The classes only render on the first hard load of the
+   scene; base state is the finished scene so reduced-motion (and any browser
+   that skips the animations) simply starts there. Input is never blocked. */
+.vm-arrive-shade {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .vm-arrive-shade {
+    animation: vm-arrive-shade 750ms ease-out both;
+  }
+  .vm-arrive-dapples {
+    animation: vm-arrive-fadein 900ms ease-out 250ms both;
+  }
+  .vm-arrive-led {
+    animation: vm-led-flicker 800ms linear both;
+  }
+}
+
+@keyframes vm-arrive-shade {
+  from { opacity: 0.9; }
+  to   { opacity: 0; }
+}
+
+@keyframes vm-arrive-fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* fluorescent stutter: dark, catch, drop, catch, dim, steady */
+@keyframes vm-led-flicker {
+  0%, 34% { opacity: 0; }
+  38%     { opacity: 1; }
+  46%     { opacity: 0.25; }
+  52%     { opacity: 1; }
+  62%     { opacity: 0.4; }
+  68%, 100% { opacity: 1; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .vm-sway,
   .vm-marquee {
