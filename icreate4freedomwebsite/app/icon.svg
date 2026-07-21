@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- one of the machine's GROW cans -->
+  <rect x="7" y="5" width="18" height="25" rx="4" fill="#3f7d44"/>
+  <rect x="7" y="5" width="6" height="25" rx="3" fill="#2a5530" opacity="0.6"/>
+  <rect x="19.5" y="8" width="2.8" height="19" rx="1.4" fill="#ffffff" opacity="0.35"/>
+  <rect x="8.2" y="2.5" width="15.6" height="5" rx="2.5" fill="#c6c6c6"/>
+</svg>

@@ -1,16 +1,17 @@
 interface Props {
   x: number; y: number;
   size?: number; rotate?: number; fill?: string;
-  sway?: boolean; reduced?: boolean;
+  sway?: boolean;
 }
 
 /* Fatsia japonica leaf. Outer <g> positions it; inner <g> carries the sway
-   animation so the CSS transform doesn't clobber the placement transform. */
-export function Fatsia({ x, y, size = 80, rotate = 0, fill = "#3c7a41", sway = false, reduced = false }: Props) {
+   animation so the CSS transform doesn't clobber the placement transform.
+   Sway is gated behind prefers-reduced-motion in vending-machine.css. */
+export function Fatsia({ x, y, size = 80, rotate = 0, fill = "#3c7a41", sway = false }: Props) {
   const lobes = [-72, -48, -24, 0, 24, 48, 72];
   return (
     <g transform={`translate(${x},${y}) rotate(${rotate})`}>
-      <g style={sway && !reduced ? { animation: "vm-sway 7s ease-in-out infinite", transformOrigin: "0px 0px" } : undefined}>
+      <g className={sway ? "vm-sway" : undefined}>
         {lobes.map((a) => {
           const len = size * (1 - Math.abs(a) / 220);
           return (

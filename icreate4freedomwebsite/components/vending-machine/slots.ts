@@ -9,6 +9,7 @@ export interface Slot {
   id: string;       // stable key, also shown on the selection button
   label: string;    // text printed on the cans
   route: string;    // Next.js route this slot vends
+  price: number;    // yen shown on the LED display while hovering
   shelf: 0 | 1 | 2; // which shelf row
   x: number;        // x of the row's first can inside the window
   count: number;    // how many can facings in the row
@@ -18,11 +19,14 @@ export interface Slot {
 }
 
 export const SLOTS: Slot[] = [
-  { id: "about",    label: "ME",   route: "/about",    shelf: 0, x: 112, count: 3, can: "#e9e7df", canDark: "#b7b2a4", text: "#4a463e" },
-  { id: "projects", label: "DEV",  route: "/projects", shelf: 0, x: 210, count: 3, can: "#2e6fb7", canDark: "#1d4a7e", text: "#eaf2fb" },
-  { id: "garden",   label: "GROW", route: "/garden",   shelf: 1, x: 114, count: 7, can: "#3f7d44", canDark: "#2a5530", text: "#e9f5ea" },
-  { id: "writing",  label: "INK",  route: "/writing",  shelf: 2, x: 114, count: 7, can: "#c8651c", canDark: "#93481a", text: "#fdf0e3" },
+  { id: "about",    label: "ME",   route: "/about",    price: 100, shelf: 0, x: 112, count: 3, can: "#e9e7df", canDark: "#b7b2a4", text: "#4a463e" },
+  { id: "projects", label: "DEV",  route: "/projects", price: 120, shelf: 0, x: 210, count: 3, can: "#2e6fb7", canDark: "#1d4a7e", text: "#eaf2fb" },
+  { id: "garden",   label: "GROW", route: "/garden",   price: 110, shelf: 1, x: 114, count: 7, can: "#3f7d44", canDark: "#2a5530", text: "#e9f5ea" },
+  { id: "writing",  label: "INK",  route: "/writing",  price: 130, shelf: 2, x: 114, count: 7, can: "#c8651c", canDark: "#93481a", text: "#fdf0e3" },
 ];
+
+/** "about" → "About" — accessible name for a slot's link */
+export const slotName = (s: Slot) => s.id[0].toUpperCase() + s.id.slice(1);
 
 // ---- machine geometry (shared by parts + animation math) ----
 export const CAN_W = 24;

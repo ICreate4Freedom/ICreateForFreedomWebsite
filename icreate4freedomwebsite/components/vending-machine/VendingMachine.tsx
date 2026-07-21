@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect, useRef, type CSSProperties } from "react";
+import { useState, useEffect, useRef, useSyncExternalStore, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { SLOTS, SHELF_CAN_Y, DROP_LAND_Y, dropCanX, type Slot } from "./slots";
 import { SmallCan } from "./parts/SmallCan";
 import { ProductRow } from "./parts/ProductRow";
 import { MachineBody } from "./parts/MachineBody";
-import { CoinColumn } from "./parts/CoinColumn";
+import { CoinColumn, type LedDisplay } from "./parts/CoinColumn";
 import { LowerDoor } from "./parts/LowerDoor";
 import { EnvironmentBack, Atmosphere } from "./parts/Environment";
 import { Overgrowth, Pot } from "./parts/Overgrowth";
@@ -15,37 +15,74 @@ import { CrtPile } from "./parts/CrtPile";
 import { Payphone } from "./parts/Payphone";
 import { Annotations } from "./parts/Annotations";
 
-const DROP_MS = 1000;
+const DROP_MS = 700;    // can fall duration
+const SETTLE_MS = 150;  // beat after the can lands, before the route changes
+const IDLE_MS = 6000;   // quiet time before the LED starts inviting
+
+const REDUCED_MQ = "(prefers-reduced-motion: reduce)";
+const subscribeReduced = (onChange: () => void) => {
+  const mq = window.matchMedia(REDUCED_MQ);
+  mq.addEventListener("change", onChange);
+  return () => mq.removeEventListener("change", onChange);
+};
+const reducedSnapshot = () => window.matchMedia(REDUCED_MQ).matches;
 
 export default function VendingMachine() {
   const router = useRouter();
   const [hovered, setHovered] = useState<string | null>(null);
   const [dispensing, setDispensing] = useState<Slot | null>(null);
-  const [reduced, setReduced] = useState(false);
+  const [idle, setIdle] = useState(false);
+  const reduced = useSyncExternalStore(subscribeReduced, reducedSnapshot, () => false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const armIdle = () => {
+    if (idleTimer.current) clearTimeout(idleTimer.current);
+    idleTimer.current = setTimeout(() => setIdle(true), IDLE_MS);
+  };
 
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const fn = (e: MediaQueryListEvent) => setReduced(e.matches);
-    mq.addEventListener("change", fn);
+    // only four pages exist — prefetch them all so touch users (who never
+    // hover) get instant vends too
+    SLOTS.forEach((slot) => router.prefetch(slot.route));
+    armIdle();
     return () => {
-      mq.removeEventListener("change", fn);
       if (timer.current) clearTimeout(timer.current);
+      if (idleTimer.current) clearTimeout(idleTimer.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const hover = (slot: Slot) => {
     setHovered(slot.id);
-    router.prefetch(slot.route); // destination is loaded before the can lands
+    setIdle(false);
+    if (idleTimer.current) clearTimeout(idleTimer.current);
+  };
+
+  const leave = () => {
+    setHovered(null);
+    armIdle();
   };
 
   const press = (slot: Slot) => {
     if (dispensing) return;
+    setIdle(false);
+    if (idleTimer.current) clearTimeout(idleTimer.current);
     if (reduced) { router.push(slot.route); return; } // no animation, just go
     setDispensing(slot);
-    timer.current = setTimeout(() => router.push(slot.route), DROP_MS);
+    timer.current = setTimeout(() => router.push(slot.route), DROP_MS + SETTLE_MS);
   };
+
+  const hoveredSlot = hovered ? SLOTS.find((s) => s.id === hovered) ?? null : null;
+  const display: LedDisplay = dispensing
+    ? { text: "VENDING" }
+    : hoveredSlot
+      ? { text: `${hoveredSlot.id.toUpperCase()} ¥${hoveredSlot.price}` }
+      : idle
+        ? reduced
+          ? { text: "PICK A CAN" }
+          : { text: "いらっしゃいませ ・ PICK A CAN", marquee: true }
+        : { text: "¥000" };
 
   const dropDist = dispensing ? DROP_LAND_Y - SHELF_CAN_Y[dispensing.shelf] : 0;
 
@@ -67,10 +104,13 @@ export default function VendingMachine() {
           </clipPath>
         </defs>
 
-        <EnvironmentBack />
-        <CrtPile />
-        <Payphone />
-        <MachineBody />
+        {/* scene + machine shell: decor only, quiet for screen readers */}
+        <g aria-hidden="true">
+          <EnvironmentBack />
+          <CrtPile />
+          <Payphone />
+          <MachineBody />
+        </g>
 
         {SLOTS.map((slot) => (
           <ProductRow
@@ -80,36 +120,38 @@ export default function VendingMachine() {
             pressed={dispensing?.id === slot.id}
             disabled={!!dispensing}
             onHover={() => hover(slot)}
-            onLeave={() => setHovered(null)}
+            onLeave={leave}
             onPress={() => press(slot)}
           />
         ))}
 
-        <CoinColumn displayText={dispensing ? "..." : "¥000"} />
-        <LowerDoor />
+        <g aria-hidden="true">
+          <CoinColumn display={display} />
+          <LowerDoor />
 
-        {dispensing && (
-          <g clipPath="url(#vm-canPath)">
-            <g
-              style={{
-                animation: `vm-drop ${DROP_MS / 1000}s cubic-bezier(0.6, 0, 1, 1) forwards`,
-                "--vm-drop-dist": `${dropDist}px`,
-              } as CSSProperties}
-            >
-              <SmallCan x={dropCanX(dispensing)} y={SHELF_CAN_Y[dispensing.shelf]} slot={dispensing} lit />
+          {dispensing && (
+            <g clipPath="url(#vm-canPath)">
+              <g
+                style={{
+                  animation: `vm-drop ${DROP_MS / 1000}s cubic-bezier(0.6, 0, 1, 1) forwards`,
+                  "--vm-drop-dist": `${dropDist}px`,
+                } as CSSProperties}
+              >
+                <SmallCan x={dropCanX(dispensing)} y={SHELF_CAN_Y[dispensing.shelf]} slot={dispensing} lit />
+              </g>
             </g>
+          )}
+
+          {/* front decor — never intercepts clicks */}
+          <g style={{ pointerEvents: "none" }}>
+            <Pot />
+            <Bicycle />
+            <Overgrowth />
+            <Annotations />
           </g>
-        )}
 
-        {/* front decor — never intercepts clicks */}
-        <g style={{ pointerEvents: "none" }}>
-          <Pot />
-          <Bicycle />
-          <Overgrowth reduced={reduced} />
-          <Annotations />
+          <Atmosphere />
         </g>
-
-        <Atmosphere />
       </svg>
     </div>
   );

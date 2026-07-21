@@ -14,6 +14,42 @@
   50%      { transform: rotate(2.6deg); }
 }
 
+.vm-sway {
+  animation: vm-sway 7s ease-in-out infinite;
+  transform-origin: 0 0;
+}
+
+/* LED marquee: text enters from the display's right edge and fully exits
+   left; the display clip (vm-ledClip) crops it to the 54px window */
+@keyframes vm-marquee {
+  from { transform: translateX(58px); }
+  to   { transform: translateX(-200px); }
+}
+
+.vm-marquee {
+  animation: vm-marquee 9s linear infinite;
+}
+
+/* Product rows are real SVG <a> elements. Suppress the UA outline (it hugs
+   the odd combined shape of cans + button) in favor of a drawn ring that
+   only appears for keyboard focus. */
+.vm-slot {
+  outline: none;
+}
+.vm-slot .vm-focus-ring {
+  opacity: 0;
+}
+.vm-slot:focus-visible .vm-focus-ring {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vm-sway,
+  .vm-marquee {
+    animation: none;
+  }
+}
+
 /* Wayside annotations that only make sense when the wide scene is visible;
    on narrow screens the scene crops to the machine and these would dangle. */
 @media (max-width: 768px) {

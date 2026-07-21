@@ -1,5 +1,5 @@
-import type { KeyboardEvent } from "react";
-import { CAN_H, CAN_STEP, SHELF_CAN_Y, groupWidth, groupCenter, type Slot } from "../slots";
+import type { KeyboardEvent, MouseEvent } from "react";
+import { CAN_H, CAN_STEP, SHELF_CAN_Y, groupWidth, groupCenter, slotName, type Slot } from "../slots";
 import { SmallCan } from "./SmallCan";
 
 interface Props {
@@ -15,20 +15,37 @@ interface Props {
 export function ProductRow({ slot, hovered, pressed, disabled, onHover, onLeave, onPress }: Props) {
   const y = SHELF_CAN_Y[slot.shelf];
   const cx = groupCenter(slot);
-  const onKeyDown = (e: KeyboardEvent<SVGGElement>) => {
-    if (!disabled && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onPress(); }
+  // React types SVG <a> as HTMLAnchorElement; at runtime it's an SVGAElement
+  const onClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    // modified clicks (new tab / window / download) keep native link behavior
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+    e.preventDefault();
+    if (!disabled) onPress();
+  };
+  const onKeyDown = (e: KeyboardEvent<HTMLAnchorElement>) => {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); if (!disabled) onPress(); }
   };
   return (
-    <g
-      role="link"
-      aria-label={`Vend ${slot.route}`}
+    <a
+      href={slot.route}
+      aria-label={slotName(slot)}
+      aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : 0}
-      style={{ cursor: disabled ? "default" : "pointer", outline: "none" }}
+      className="vm-slot"
+      style={{ cursor: disabled ? "default" : "pointer" }}
       onMouseEnter={onHover} onMouseLeave={onLeave}
       onFocus={onHover} onBlur={onLeave}
-      onClick={() => !disabled && onPress()}
+      onClick={onClick}
       onKeyDown={onKeyDown}
     >
+      {/* keyboard focus ring (shown via :focus-visible) — dark halo under a
+          white ring so it reads on both the dark glass and the light shelf */}
+      <g className="vm-focus-ring">
+        <rect x={slot.x - 7} y={y - 9} width={groupWidth(slot) + 14} height={CAN_H + 26}
+          rx="9" fill="none" stroke="#0b0e0b" strokeWidth="4.5" />
+        <rect x={slot.x - 7} y={y - 9} width={groupWidth(slot) + 14} height={CAN_H + 26}
+          rx="9" fill="none" stroke="#fff" strokeWidth="2" />
+      </g>
       {/* can facings — the middle one hides while its falling clone is live */}
       {Array.from({ length: slot.count }).map((_, i) => (
         !(pressed && i === Math.floor(slot.count / 2)) && (
@@ -47,6 +64,6 @@ export function ProductRow({ slot, hovered, pressed, disabled, onHover, onLeave,
           {slot.id.toUpperCase()}
         </text>
       </g>
-    </g>
+    </a>
   );
 }
