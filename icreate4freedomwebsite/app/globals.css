@@ -25,3 +25,26 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Route crossfade (PageFade component). Asymmetric on purpose: the old page
+   leaves quickly, the new one arrives gently once it's gone — ~350ms total. */
+::view-transition-old(.page-fade) {
+  animation: 140ms ease-out both vt-page-fade reverse;
+}
+::view-transition-new(.page-fade) {
+  animation: 210ms ease-in 140ms both vt-page-fade;
+}
+
+@keyframes vt-page-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

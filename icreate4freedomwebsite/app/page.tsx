@@ -1,4 +1,5 @@
 import VendingMachine from "@/components/vending-machine/VendingMachine";
+import { PageFade } from "@/components/PageFade";
 
 export default function Home() {
   return (
@@ -10,7 +11,9 @@ export default function Home() {
         Pick a can to open a page: About, Projects, Garden, or Writing. The
         same links are in the footer.
       </p>
-      <VendingMachine />
+      <PageFade>
+        <VendingMachine />
+      </PageFade>
     </>
   );
 }
