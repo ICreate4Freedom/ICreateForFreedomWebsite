@@ -8,7 +8,7 @@ import { ProductRow } from "./parts/ProductRow";
 import { MachineBody } from "./parts/MachineBody";
 import { CoinColumn, type LedDisplay } from "./parts/CoinColumn";
 import { LowerDoor } from "./parts/LowerDoor";
-import { EnvironmentBack, Atmosphere } from "./parts/Environment";
+import { EnvironmentBack, WetGround, Atmosphere } from "./parts/Environment";
 import { Overgrowth, Pot } from "./parts/Overgrowth";
 import { Bicycle } from "./parts/Bicycle";
 import { CrtPile } from "./parts/CrtPile";
@@ -107,6 +107,7 @@ export default function VendingMachine() {
         {/* scene + machine shell: decor only, quiet for screen readers */}
         <g aria-hidden="true">
           <EnvironmentBack />
+          <WetGround />
           <CrtPile />
           <Payphone />
           <MachineBody />

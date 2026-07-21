@@ -59,6 +59,74 @@ export function EnvironmentBack() {
   );
 }
 
+/* "After rain" pass, drawn directly on top of the ground band: a damp cool
+   wash, the machine's lit face mirrored into the asphalt, glints under the
+   lantern / live CRT / payphone, puddles, and thin sheen streaks. Static —
+   all motion stays in Atmosphere and the machine itself. */
+export function WetGround() {
+  return (
+    <g style={{ pointerEvents: "none" }}>
+      <defs>
+        {/* reflections die off quickly with distance from the object's base */}
+        <linearGradient id="vm-reflFade" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#fff" stopOpacity="0.8" />
+          <stop offset="0.55" stopColor="#fff" stopOpacity="0.3" />
+          <stop offset="1" stopColor="#fff" stopOpacity="0" />
+        </linearGradient>
+        <mask id="vm-reflMask">
+          <rect x="-480" y="620" width="1440" height="60" fill="url(#vm-reflFade)" />
+        </mask>
+      </defs>
+
+      {/* damp wash: cools and darkens the dry asphalt */}
+      <rect x="-480" y="600" width="1440" height="80" fill="#0d1420" opacity="0.16" />
+
+      {/* pool of light the lit machine throws on the wet ground */}
+      <ellipse cx="240" cy="642" rx="210" ry="30" fill="#fff6cf" opacity="0.09" />
+
+      {/* the machine's face, mirrored: base sliver, blue door (wave + dark
+          dispense notch), then the cream body fading with distance */}
+      <g mask="url(#vm-reflMask)">
+        <rect x="92" y="622" width="296" height="5" rx="2" fill="#4a463e" opacity="0.7" />
+        <rect x="94" y="627" width="292" height="20" rx="3" fill="#2b7ccb" opacity="0.6" />
+        <rect x="152" y="630" width="136" height="8" rx="3" fill="#14171b" opacity="0.6" />
+        <path d="M104,641 C160,634 250,646 300,639 C336,634 366,640 386,637 L386,647 L104,647 Z" fill="#f2f5f8" opacity="0.4" />
+        <rect x="94" y="647" width="292" height="22" rx="3" fill="#e8e6de" opacity="0.55" />
+        {/* dry streaks interrupting the reflection */}
+        <rect x="80" y="634" width="320" height="2" fill="#20241d" opacity="0.7" />
+        <rect x="80" y="653" width="320" height="2.5" fill="#20241d" opacity="0.7" />
+      </g>
+
+      {/* warm glint under the paper lantern */}
+      <ellipse cx="450" cy="630" rx="9" ry="14" fill="#ff8c42" opacity="0.16" />
+      <ellipse cx="450" cy="626" rx="5" ry="8" fill="#e2571f" opacity="0.18" />
+
+      {/* green spill from the one CRT still alive, and the payphone box */}
+      <ellipse cx="-258" cy="612" rx="26" ry="5" fill="#8fd694" opacity="0.12" />
+      <ellipse cx="653" cy="628" rx="18" ry="4" fill="#2f7d3f" opacity="0.12" />
+
+      {/* puddles: cool rims far from the machine, a warm rim in its light */}
+      {[
+        { cx: -60, cy: 650, rx: 46, ry: 7, rim: "#8fa8bf" },
+        { cx: -330, cy: 660, rx: 38, ry: 6.5, rim: "#8fa8bf" },
+        { cx: 520, cy: 644, rx: 34, ry: 6, rim: "#8fa8bf" },
+        { cx: 340, cy: 660, rx: 24, ry: 5, rim: "#d9c9a8" },
+      ].map(({ cx, cy, rx, ry, rim }, i) => (
+        <g key={i}>
+          <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="#12181a" opacity="0.85" />
+          <path d={`M${cx - rx},${cy - 1} C${cx - rx * 0.5},${cy - ry} ${cx + rx * 0.5},${cy - ry} ${cx + rx},${cy - 1}`}
+            fill="none" stroke={rim} strokeWidth="1.5" opacity="0.3" />
+        </g>
+      ))}
+
+      {/* thin sheen streaks across the asphalt */}
+      {[[-420, 622, 130], [-180, 664, 170], [60, 671, 150], [420, 655, 180], [700, 640, 150], [-40, 612, 90]].map(([x, y, w], i) => (
+        <rect key={i} x={x} y={y} width={w} height="1.5" rx="0.75" fill="#fff" opacity="0.07" />
+      ))}
+    </g>
+  );
+}
+
 /* Front-most atmosphere: dappled sunlight + vignette over the full scene.
    MUST stay pointer-events:none or it will swallow clicks on the machine. */
 export function Atmosphere() {
