@@ -9,11 +9,6 @@ import { MachineBody } from "./parts/MachineBody";
 import { CoinColumn, type LedDisplay } from "./parts/CoinColumn";
 import { LowerDoor } from "./parts/LowerDoor";
 import { EnvironmentBack, WetGround, Atmosphere } from "./parts/Environment";
-import { Overgrowth, Pot } from "./parts/Overgrowth";
-import { Bicycle } from "./parts/Bicycle";
-import { CrtPile } from "./parts/CrtPile";
-import { Payphone } from "./parts/Payphone";
-import { Annotations } from "./parts/Annotations";
 
 const DROP_MS = 700;    // can fall duration
 const SETTLE_MS = 150;  // beat after the can lands, before the route changes
@@ -116,8 +111,6 @@ export default function VendingMachine() {
         <g aria-hidden="true">
           <EnvironmentBack />
           <WetGround />
-          <CrtPile />
-          <Payphone />
           <MachineBody />
         </g>
 
@@ -152,13 +145,6 @@ export default function VendingMachine() {
           )}
 
           {/* front decor — never intercepts clicks */}
-          <g style={{ pointerEvents: "none" }}>
-            <Pot />
-            <Bicycle />
-            <Overgrowth />
-            <Annotations />
-          </g>
-
           <Atmosphere arriving={arriving} />
 
           {/* arrival shade: the alley starts dim and breathes open */}
