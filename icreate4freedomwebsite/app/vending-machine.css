@@ -87,6 +87,42 @@
   68%, 100% { opacity: 1; }
 }
 
+/* Rain. Each layer repeats one band of streaks four times and slides down by
+   exactly one band height, so the loop is seamless; only the group is
+   animated, not the individual lines. Speed differences give the parallax. */
+@keyframes vm-rain {
+  from { transform: translateY(0); }
+  to   { transform: translateY(340px); }
+}
+
+.vm-rain {
+  animation: vm-rain linear infinite;
+  will-change: transform;
+}
+.vm-rain--far  { animation-duration: 1.75s; }
+.vm-rain--mid  { animation-duration: 1.15s; }
+.vm-rain--near { animation-duration: 0.62s; }
+
+/* a drip gathering on the awning edge, then letting go */
+@keyframes vm-drip {
+  0%, 55%  { transform: translateY(0); opacity: 0; }
+  62%      { opacity: 0.9; }
+  100%     { transform: translateY(58px); opacity: 0; }
+}
+.vm-drip {
+  animation: vm-drip 2.4s ease-in infinite;
+}
+
+/* rings opening in the standing water */
+@keyframes vm-ripple {
+  0%   { transform: scale(0.15); opacity: 0.55; }
+  100% { transform: scale(1.7);  opacity: 0; }
+}
+.vm-ripple {
+  animation: vm-ripple 2.8s ease-out infinite;
+  transform-origin: 0 0;
+}
+
 /* B4 — annotation hierarchy: the machine-vision layer rests quiet and wakes
    while a cursor is in the scene. Touch devices simply keep the resting
    state; the layer is decor either way. */
@@ -105,6 +141,17 @@
   }
   .vm-annotations {
     transition: none;
+  }
+  /* The rain stays visible but stops moving — frozen streaks read as a long
+     exposure, so the scene is still legibly raining rather than losing the
+     weather entirely. The drips and ripples do vanish: a stalled drip halfway
+     down the air, or a ring frozen mid-spread, reads as a glitch. */
+  .vm-rain {
+    animation: none;
+  }
+  .vm-drip,
+  .vm-ripple {
+    display: none;
   }
 }
 

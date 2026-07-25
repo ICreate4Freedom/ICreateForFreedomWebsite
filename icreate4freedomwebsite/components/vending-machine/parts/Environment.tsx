@@ -304,9 +304,30 @@ export function EnvironmentBack() {
           only half the wall, the rest carries a service door, meters, crates
           and a noren, so it reads as a building rather than a flat panel. */}
       <rect x="-480" y="150" width="530" height="454" fill="#222728" />
-      <Shutter x={-246} y={196} width={150} height={408} />
       <rect x="-480" y="145" width="530" height="11" fill="#111618" />
-      <rect x="-254" y="186" width="166" height="12" rx="2" fill="#161c1d" />
+
+      {/* The shuttered bay, built as a real shopfront: two jambs and a lintel,
+          with the shutter filling the opening exactly so it is centred by
+          construction. Previously the shutter floated with 54 units of bare
+          wall on one side and 12 on the other, and no jamb at all — at the
+          frame's edge it just ran into the dark and read as cut off. */}
+      <rect x="-292" y="184" width="210" height="14" rx="2" fill="#161c1d" />
+      <rect x="-292" y="196" width="16" height="408" fill="#2c3331" />
+      <rect x="-288" y="200" width="3" height="400" fill="#3d4643" opacity="0.55" />
+      <rect x="-98" y="196" width="16" height="408" fill="#2c3331" />
+      <rect x="-94" y="200" width="3" height="400" fill="#3d4643" opacity="0.55" />
+      {/* opening -276..-98 → shutter is exactly the opening, so it is centred */}
+      <Shutter x={-276} y={196} width={178} height={408} />
+      {/* pull handle and lock, centred on the shutter */}
+      <rect x="-197" y="566" width="20" height="4" rx="2" fill="#5a6462" opacity="0.8" />
+      <circle cx="-187" cy="552" r="3" fill="#0c1113" />
+      {/* a notice taped to the closed shutter */}
+      <g transform="rotate(-1.5 -187 300)">
+        <rect x="-211" y="272" width="48" height="60" rx="1" fill="#d9d2bd" opacity="0.5" stroke="#7b7460" strokeWidth="0.8" />
+        {[284, 294, 304, 314, 324].map((ly, i) => (
+          <line key={ly} x1="-205" y1={ly} x2={-205 + (i % 2 ? 26 : 34)} y2={ly} stroke="#4b4a3e" strokeWidth="0.9" opacity="0.55" />
+        ))}
+      </g>
       <rect x="28" y="150" width="18" height="454" fill="#151a1a" />
       <rect x="38" y="155" width="3" height="449" fill="#67533a" opacity="0.42" />
 

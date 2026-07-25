@@ -11,6 +11,7 @@ import { LowerDoor } from "./parts/LowerDoor";
 import { EnvironmentBack, WetGround, Atmosphere } from "./parts/Environment";
 import { Overgrowth, Foreground } from "./parts/Overgrowth";
 import { Bicycle } from "./parts/Bicycle";
+import { RainBack, RainFront, RainHaze } from "./parts/Rain";
 
 const DROP_MS = 700;    // can fall duration
 const SETTLE_MS = 150;  // beat after the can lands, before the route changes
@@ -117,6 +118,7 @@ export default function VendingMachine() {
         {/* the street, behind everything: decor only, quiet for screen readers */}
         <g aria-hidden="true">
           <EnvironmentBack />
+          <RainBack />
           <Overgrowth />
           <WetGround />
         </g>
@@ -171,6 +173,8 @@ export default function VendingMachine() {
         <g aria-hidden="true" style={{ pointerEvents: "none" }}>
           <Bicycle />
           <Foreground />
+          <RainFront />
+          <RainHaze />
           <Atmosphere arriving={arriving} />
 
           {/* arrival shade: the alley starts dim and breathes open */}
