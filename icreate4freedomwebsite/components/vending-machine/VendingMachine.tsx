@@ -2,13 +2,16 @@
 
 import { useState, useEffect, useRef, useSyncExternalStore, type CSSProperties } from "react";
 import { useRouter } from "next/navigation";
-import { SLOTS, SHELF_CAN_Y, DROP_LAND_Y, dropCanX, type Slot } from "./slots";
+import { SLOTS, SHELF_CAN_Y, DROP_LAND_Y, dropCanX, MACHINE_TRANSFORM, type Slot } from "./slots";
 import { SmallCan } from "./parts/SmallCan";
 import { ProductRow } from "./parts/ProductRow";
 import { MachineBody } from "./parts/MachineBody";
 import { CoinColumn, type LedDisplay } from "./parts/CoinColumn";
 import { LowerDoor } from "./parts/LowerDoor";
 import { EnvironmentBack, WetGround, Atmosphere } from "./parts/Environment";
+import { Overgrowth, Foreground } from "./parts/Overgrowth";
+import { Bicycle } from "./parts/Bicycle";
+import { Annotations } from "./parts/Annotations";
 
 const DROP_MS = 700;    // can fall duration
 const SETTLE_MS = 150;  // beat after the can lands, before the route changes
@@ -90,14 +93,21 @@ export default function VendingMachine() {
   const dropDist = dispensing ? DROP_LAND_Y - SHELF_CAN_Y[dispensing.shelf] : 0;
 
   return (
-    <div className="h-[calc(100dvh-2.5rem)] w-full overflow-hidden select-none bg-[#08090e]">
-      {/* wide viewBox: machine stays at 0..480, alley extends to the sides;
-          "slice" fills the viewport — narrow screens crop to the machine */}
+    <div className="flex h-[calc(100dvh-2.5rem)] w-full items-center justify-center overflow-hidden select-none bg-[#08090e]">
+      {/* The viewBox is tight around the machine (x -260..740) so it commands
+          the frame; "slice" fills the viewport, and narrow screens crop to the
+          machine alone. maxWidth caps the box's aspect ratio so ultrawide
+          monitors letterbox into the dark backdrop instead of slicing the
+          machine's header off the top. */}
       <svg
-        viewBox="-480 0 1440 680"
+        viewBox="-260 0 1000 680"
         preserveAspectRatio="xMidYMid slice"
         className="vm-scene h-full w-full"
-        aria-label="ICreate4Freedom navigation — a vending machine reclaimed by plants; each button vends a page"
+        /* 1.78 is the widest box aspect that still shows the machine's full
+           height (viewBox 1000 wide / 1.78 ≈ 562 units visible, vs the 556 the
+           machine occupies). Anything wider starts slicing its feet and roof. */
+        style={{ maxWidth: "calc((100dvh - 2.5rem) * 1.78)" }}
+        aria-label="ICreate4Freedom navigation — a vending machine in a Japanese side street, reclaimed by plants; each button vends a page"
       >
         <defs>
           {/* falling can is visible only inside the window and the opening */}
@@ -107,50 +117,70 @@ export default function VendingMachine() {
           </clipPath>
         </defs>
 
-        {/* scene + machine shell: decor only, quiet for screen readers */}
+        {/* the street, behind everything: decor only, quiet for screen readers */}
         <g aria-hidden="true">
           <EnvironmentBack />
+          <Overgrowth />
           <WetGround />
-          <MachineBody />
         </g>
 
-        {SLOTS.map((slot) => (
-          <ProductRow
-            key={slot.id}
-            slot={slot}
-            hovered={hovered === slot.id}
-            pressed={dispensing?.id === slot.id}
-            disabled={!!dispensing}
-            onHover={() => hover(slot)}
-            onLeave={leave}
-            onPress={() => press(slot)}
-          />
-        ))}
+        {/* THE MACHINE. Scaled as one unit — the clip paths below are
+            userSpaceOnUse, so vm-canPath / vm-doorClip / vm-ledClip inherit this
+            transform along with the geometry they clip, and no part coordinate
+            has to change. The product rows must stay inside this group or their
+            hit areas would drift away from the cans they draw. */}
+        <g transform={MACHINE_TRANSFORM}>
+          <g aria-hidden="true">
+            <MachineBody />
+          </g>
 
-        <g aria-hidden="true">
-          <CoinColumn display={display} arriving={arriving} />
-          <LowerDoor />
+          {SLOTS.map((slot) => (
+            <ProductRow
+              key={slot.id}
+              slot={slot}
+              hovered={hovered === slot.id}
+              pressed={dispensing?.id === slot.id}
+              disabled={!!dispensing}
+              onHover={() => hover(slot)}
+              onLeave={leave}
+              onPress={() => press(slot)}
+            />
+          ))}
 
-          {dispensing && (
-            <g clipPath="url(#vm-canPath)">
-              <g
-                style={{
-                  animation: `vm-drop ${DROP_MS / 1000}s cubic-bezier(0.6, 0, 1, 1) forwards`,
-                  "--vm-drop-dist": `${dropDist}px`,
-                } as CSSProperties}
-              >
-                <SmallCan x={dropCanX(dispensing)} y={SHELF_CAN_Y[dispensing.shelf]} slot={dispensing} lit />
+          <g aria-hidden="true">
+            <CoinColumn display={display} arriving={arriving} />
+            <LowerDoor />
+
+            {dispensing && (
+              <g clipPath="url(#vm-canPath)">
+                <g
+                  style={{
+                    animation: `vm-drop ${DROP_MS / 1000}s cubic-bezier(0.6, 0, 1, 1) forwards`,
+                    "--vm-drop-dist": `${dropDist}px`,
+                  } as CSSProperties}
+                >
+                  <SmallCan x={dropCanX(dispensing)} y={SHELF_CAN_Y[dispensing.shelf]} slot={dispensing} lit />
+                </g>
               </g>
-            </g>
-          )}
+            )}
+          </g>
+        </g>
 
-          {/* front decor — never intercepts clicks */}
+        {/* Everything in FRONT of the machine. This layer is what makes the
+            scene read as a photograph rather than a flat elevation — leaves
+            crowd the lens and the bicycle leans across the lower door, exactly
+            as in the reference shots. pointer-events:none keeps every one of
+            these shapes from swallowing a vend click. */}
+        <g aria-hidden="true" style={{ pointerEvents: "none" }}>
+          <Bicycle />
+          <Foreground />
+          <Annotations />
           <Atmosphere arriving={arriving} />
 
           {/* arrival shade: the alley starts dim and breathes open */}
           {arriving && (
             <rect x="-480" y="0" width="1440" height="680" fill="#08090e"
-              className="vm-arrive-shade" style={{ pointerEvents: "none" }} />
+              className="vm-arrive-shade" />
           )}
         </g>
       </svg>

@@ -36,8 +36,13 @@
 .vm-slot {
   outline: none;
 }
+/* Purely a focus indicator, so it must never capture the pointer: the rings of
+   the two rows sharing the top shelf overlap by ~12 units, and an invisible
+   stroke (opacity 0 is still "visible" to hit-testing) would steal clicks
+   meant for the neighbouring row. */
 .vm-slot .vm-focus-ring {
   opacity: 0;
+  pointer-events: none;
 }
 .vm-slot:focus-visible .vm-focus-ring {
   opacity: 1;

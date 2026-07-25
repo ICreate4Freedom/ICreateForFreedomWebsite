@@ -31,9 +31,9 @@ export interface Slot {
 }
 
 export const SLOTS: Slot[] = [
-  { id: "about",    label: "ME",   route: "/about",    price: 100, shelf: 0, x: 112, count: 3, can: "#e9e7df", canDark: "#b7b2a4", text: "#4a463e",
+  { id: "about",    label: "ME",   route: "/about",    price: 100, shelf: 0, x: 114, count: 3, can: "#e9e7df", canDark: "#b7b2a4", text: "#4a463e",
     room: { bg: "#171610", surface: "#201e16", line: "#38352a", accent: "#e9e7df", text: "#ece9dd", muted: "#9c968a" } },
-  { id: "projects", label: "DEV",  route: "/projects", price: 120, shelf: 0, x: 210, count: 3, can: "#2e6fb7", canDark: "#1d4a7e", text: "#eaf2fb",
+  { id: "projects", label: "DEV",  route: "/projects", price: 120, shelf: 0, x: 192, count: 4, can: "#2e6fb7", canDark: "#1d4a7e", text: "#eaf2fb",
     room: { bg: "#0d1521", surface: "#131e2e", line: "#263850", accent: "#6da7e0", text: "#e8f0f8", muted: "#8fa5bc" } },
   { id: "garden",   label: "GROW", route: "/garden",   price: 110, shelf: 1, x: 114, count: 7, can: "#3f7d44", canDark: "#2a5530", text: "#e9f5ea",
     room: { bg: "#0e1a11", surface: "#152418", line: "#2a4030", accent: "#79b97f", text: "#e9f5ea", muted: "#8fa894" } },
@@ -43,6 +43,19 @@ export const SLOTS: Slot[] = [
 
 /** "about" → "About" — accessible name for a slot's link */
 export const slotName = (s: Slot) => s.id[0].toUpperCase() + s.id.slice(1);
+
+/* The whole machine assembly is drawn in its own coordinate space (x 90..390,
+   y 95..620) and then scaled up as one unit so it commands the frame the way
+   it does in the reference photos. Everything inside — including the clip
+   paths, which are userSpaceOnUse — inherits this transform, so no part
+   coordinate ever has to change. Scaled about the machine's own centre so it
+   grows in place rather than drifting. */
+export const MACHINE_SCALE = 1.06;
+const MACHINE_CX = 240;  // (90 + 390) / 2 — the body's horizontal centre
+const MACHINE_CY = 614;  // pivot at the FEET, so the machine grows upward and
+                         // its base stays planted on the pavement at y≈620
+export const MACHINE_TRANSFORM =
+  `translate(${MACHINE_CX} ${MACHINE_CY}) scale(${MACHINE_SCALE}) translate(${-MACHINE_CX} ${-MACHINE_CY})`;
 
 // ---- machine geometry (shared by parts + animation math) ----
 export const CAN_W = 24;

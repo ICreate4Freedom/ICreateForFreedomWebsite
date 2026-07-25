@@ -12,9 +12,15 @@ function Wheel({ cx, cy, r }: { cx: number; cy: number; r: number }) {
   );
 }
 
+/* Leans across the machine's lower door, as in the reference photo. It is the
+   scene's primary foreground occluder — overlapping the machine is precisely
+   what gives the flat SVG depth. Drawn only below y≈440 so it never reaches
+   the selection buttons, and its parent group is pointer-events:none. */
 export function Bicycle() {
   return (
-    <g strokeLinecap="round">
+    // scaled about its own contact point so the wheels stay on the pavement;
+    // slightly larger than MACHINE_SCALE because it sits nearer the camera
+    <g strokeLinecap="round" transform="translate(240 620) scale(1.1) translate(-240 -620)">
       <Wheel cx={140} cy={572} r={54} />
       <Wheel cx={300} cy={566} r={58} />
       <g stroke="#33413a" strokeWidth="7" fill="none">

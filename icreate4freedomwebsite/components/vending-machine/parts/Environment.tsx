@@ -161,13 +161,46 @@ export function EnvironmentBack() {
       </g>
       {[-284, 502, 738].map((x) => <circle key={x} cx={x} cy={x === 502 ? 110 : 89} r="3" fill="#171e20" />)}
 
-      {/* Closed neighboring shop. It remains quiet so the machine remains the beacon. */}
+      {/* Closed neighbouring shop. It stays quiet so the machine remains the
+          beacon, but it is broken up with real fittings — a shuttered bay is
+          only half the wall, the rest carries a service door, meters, crates
+          and a noren, so it reads as a building rather than a flat panel. */}
       <rect x="-480" y="150" width="530" height="454" fill="#222728" />
-      <Shutter x={-452} y={174} width={454} height={430} />
+      <Shutter x={-246} y={196} width={150} height={408} />
       <rect x="-480" y="145" width="530" height="11" fill="#111618" />
+      <rect x="-254" y="186" width="166" height="12" rx="2" fill="#161c1d" />
       <rect x="28" y="150" width="18" height="454" fill="#151a1a" />
       <rect x="38" y="155" width="3" height="449" fill="#67533a" opacity="0.42" />
-      <rect x="-416" y="534" width="126" height="5" fill="#2e3935" opacity="0.54" />
+
+      {/* service half of the shop front */}
+      <rect x="-84" y="150" width="114" height="454" fill="#272d2c" />
+      <line x1="-84" y1="150" x2="-84" y2="604" stroke="#141a1a" strokeWidth="3" />
+      <Door x={-62} y={410} width={58} height={194} />
+      {/* noren curtain over the doorway */}
+      <g>
+        <rect x="-70" y="392" width="74" height="24" fill="#243a4a" />
+        {[-50, -32, -14].map((x) => <line key={x} x1={x} y1="394" x2={x} y2="416" stroke="#16242f" strokeWidth="1.5" />)}
+        <rect x="-72" y="388" width="78" height="5" rx="1.5" fill="#3b3229" />
+      </g>
+      {/* meter box + conduit */}
+      <rect x="6" y="330" width="26" height="40" rx="2" fill="#3d4441" />
+      <rect x="10" y="336" width="18" height="14" rx="1.5" fill="#8b9089" opacity="0.5" />
+      <path d="M18,370 C15,410 23,450 19,496" fill="none" stroke="#333b38" strokeWidth="2.5" />
+      {/* stacked beer crates against the wall */}
+      {[[-72, 550], [-72, 524], [-40, 550]].map(([x, y], i) => (
+        <g key={i}>
+          <rect x={x} y={y} width="34" height="24" rx="2" fill={i === 1 ? "#4a3b2a" : "#3f4a3c"} stroke="#1d2320" strokeWidth="1.2" />
+          <line x1={x + 3} y1={y + 7} x2={x + 31} y2={y + 7} stroke="#1d2320" strokeWidth="1" opacity="0.6" />
+          <line x1={x + 17} y1={y + 2} x2={x + 17} y2={y + 22} stroke="#1d2320" strokeWidth="1" opacity="0.5" />
+        </g>
+      ))}
+      {/* a second bicycle parked further down the alley, small and dim */}
+      <g stroke="#2b3331" strokeWidth="2" fill="none" opacity="0.7">
+        <circle cx="-208" cy="578" r="19" />
+        <circle cx="-156" cy="578" r="19" />
+        <path d="M-208,578 L-186,552 L-162,552 M-186,552 L-156,578 M-192,545 L-176,545" />
+      </g>
+      <rect x="-236" y="534" width="110" height="5" fill="#2e3935" opacity="0.54" />
 
       {/* Building behind the machine: plaster wall, fascia, awning, pipes, and
           one real condenser mounted to the adjacent service wall. */}
@@ -177,13 +210,22 @@ export function EnvironmentBack() {
       <path d="M56,101 H471 L452,136 H75 Z" fill="url(#vm-awning)" />
       <path d="M74,136 H452" stroke="#171918" strokeWidth="4" />
       {[92, 152, 212, 272, 332, 392].map((x) => <line key={x} x1={x} y1="101" x2={x - 10} y2="136" stroke="#8d7656" strokeWidth="1" opacity="0.4" />)}
+      {/* Brackets tying the awning back to the wall. Without these the machine
+          occludes the awning's middle and the two visible ends read as a pair
+          of floating wedges rather than one canopy passing behind. */}
+      {[[62, 74], [456, 448]].map(([xTop, xBot], i) => (
+        <g key={i} stroke="#20241f" strokeWidth="3" fill="none" strokeLinecap="round">
+          <path d={`M${xTop},101 L${xBot},137`} />
+          <path d={`M${xTop},101 L${xTop + (i ? -4 : 4)},152`} />
+          <path d={`M${xTop + (i ? -3 : 3)},128 L${xBot},137`} strokeWidth="2" opacity="0.7" />
+        </g>
+      ))}
       <rect x="62" y="146" width="9" height="458" fill="#1f2723" />
       {[218, 376, 520].map((y) => <rect key={y} x="58" y={y} width="17" height="5" rx="2" fill="#4a5048" />)}
       <path d="M76,174 C99,188 92,208 87,226 C81,249 89,267 82,292" fill="none" stroke="#5a6259" strokeWidth="2" opacity="0.55" />
       <AirUnit x={402} y={160} scale={0.82} />
       <path d="M450,207 C466,234 456,271 462,301 C469,337 457,383 464,414" fill="none" stroke="#3c4a45" strokeWidth="2.2" />
       <Window x={413} y={290} width={35} height={62} warm />
-      <ellipse cx="240" cy="340" rx="315" ry="300" fill="url(#vm-machineHalo)" />
 
       {/* Right: a recognisable low-rise apartment / shop facade. Windows have
           sills, doors meet the pavement, and the balcony and stair structure
@@ -215,11 +257,25 @@ export function EnvironmentBack() {
       <rect x="879" y="132" width="10" height="472" fill="#151d1d" />
       <path d="M886,166 C872,221 891,288 881,344 C873,390 889,437 882,485" fill="none" stroke="#53635c" strokeWidth="2" opacity="0.54" />
 
-      {/* Pavement and small planted edges. */}
+      {/* The machine's glow, painted after every facade so it spills onto both
+          sides of the street. Painted mid-stack it was sliced by the right
+          facade, leaving a hard vertical seam and light that stopped dead. */}
+      <ellipse cx="240" cy="340" rx="315" ry="300" fill="url(#vm-machineHalo)" />
+
+      {/* Pavement runs the full width with a curb, so every door opens onto a
+          footpath instead of straight onto the road. */}
       <rect x="-480" y="604" width="1440" height="76" fill="url(#vm-road)" />
-      <rect x="40" y="604" width="454" height="18" fill="#2c2c29" />
+      <rect x="-480" y="604" width="1440" height="18" fill="#2c2c29" />
+      {/* plinths where the buildings meet the pavement */}
+      <rect x="-480" y="596" width="530" height="10" fill="#1b201f" />
+      <rect x="46" y="596" width="436" height="10" fill="#20241f" />
+      <rect x="492" y="596" width="468" height="10" fill="#1b2323" />
       <line x1="-480" y1="623" x2="960" y2="623" stroke="#111719" strokeWidth="3" />
       <line x1="-480" y1="629" x2="960" y2="629" stroke="#52615b" strokeWidth="1" opacity="0.34" />
+      {/* paving joints */}
+      {[-444, -366, -288, -210, -132, -54, 24, 102, 180, 258, 336, 414, 492, 570, 648, 726, 804, 882].map((x) => (
+        <line key={x} x1={x} y1="604" x2={x} y2="622" stroke="#1f2422" strokeWidth="1" opacity="0.5" />
+      ))}
       {[-372, -226, -78, 476, 624, 812].map((x) => <rect key={x} x={x} y="636" width="64" height="2" rx="1" fill="#8ca19a" opacity="0.14" />)}
       <ellipse cx="240" cy="621" rx="188" ry="13" fill="#000" opacity="0.36" />
       <Planter x={-6} y={558} body="#6f4e39" leaf="#31593b" />
@@ -246,9 +302,10 @@ export function WetGround() {
       </defs>
       <rect x="-480" y="622" width="1440" height="58" fill="#0b1720" opacity="0.2" />
       <g mask="url(#vm-reflectionMask)">
-        <rect x="94" y="628" width="292" height="13" fill="#d0cfbf" opacity="0.3" />
-        <rect x="102" y="642" width="278" height="16" fill="#2b6fae" opacity="0.23" />
-        <path d="M108,657 C168,651 252,665 306,657 C338,652 368,658 382,655 L382,666 L108,666 Z" fill="#e6e8e4" opacity="0.16" />
+        {/* widened to match the machine's scaled footprint (x 81..399) */}
+        <rect x="84" y="628" width="312" height="13" fill="#d0cfbf" opacity="0.3" />
+        <rect x="92" y="642" width="298" height="16" fill="#2b6fae" opacity="0.23" />
+        <path d="M98,657 C162,651 252,665 310,657 C344,652 376,658 392,655 L392,666 L98,666 Z" fill="#e6e8e4" opacity="0.16" />
       </g>
       {[
         { cx: -188, cy: 657, rx: 72, ry: 7, rim: "#5f7681" },

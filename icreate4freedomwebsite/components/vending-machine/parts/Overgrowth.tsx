@@ -4,9 +4,8 @@ export function Pot() {
   return <path d="M396,566 L444,566 L436,624 L404,624 Z" fill="#a4552e" stroke="#7c3f21" strokeWidth="2" />;
 }
 
-/* Fatsia clusters + the vine creeping up the machine's right edge.
-   (The old top-of-frame canopy is gone — greenery now spills from the
-   gardens and walls drawn in EnvironmentBack.) */
+/* MIDGROUND greenery — drawn behind the machine, at the wall bases and along
+   the machine's right edge. The frame-crowding canopy lives in Foreground. */
 export function Overgrowth() {
   return (
     <g>
@@ -22,11 +21,48 @@ export function Overgrowth() {
         <Fatsia key={i} x={x} y={y} size={26} rotate={i % 2 ? 300 : 60} fill="#356b3a" />
       ))}
       {/* wayside weeds at the wall bases — cropped away on narrow screens */}
-      <Fatsia x={-430} y={598} size={46} rotate={352} fill="#356b3a" />
-      <Fatsia x={-340} y={604} size={40} rotate={8} fill="#2f5e33" />
+      <Fatsia x={-262} y={598} size={46} rotate={352} fill="#356b3a" />
+      <Fatsia x={-190} y={604} size={40} rotate={8} fill="#2f5e33" />
       <Fatsia x={-70} y={600} size={36} rotate={350} fill="#356b3a" />
       <Fatsia x={500} y={602} size={38} rotate={10} fill="#2f5e33" />
-      <Fatsia x={880} y={600} size={44} rotate={355} fill="#2f5e33" />
+      <Fatsia x={700} y={600} size={44} rotate={355} fill="#2f5e33" />
+    </g>
+  );
+}
+
+/* FOREGROUND — the layer that was missing entirely. Everything here paints in
+   FRONT of the machine, which is what turns a flat elevation into a photograph:
+   the reference shots all have leaves crowding the lens and a bike leaning
+   across the machine's lower half. Rendered inside a pointer-events:none group
+   so it can never intercept a vend click. */
+export function Foreground() {
+  return (
+    <g>
+      {/* vine crossing the machine's face, tying it into the alley */}
+      <path d="M404,168 C356,150 300,168 258,150 C214,131 168,152 118,138"
+        fill="none" stroke="#2b5730" strokeWidth="3" strokeLinecap="round" opacity="0.9" />
+      {[[368, 158], [300, 156], [232, 146], [160, 144]].map(([x, y], i) => (
+        <Fatsia key={i} x={x} y={y} size={22} rotate={i % 2 ? 148 : 205} fill="#3c7a41" />
+      ))}
+
+      {/* canopy crowding the top corners — the strongest depth cue */}
+      <Fatsia x={-206} y={-42} size={168} rotate={158} fill="#1f4325" sway />
+      <Fatsia x={-96} y={-70} size={140} rotate={182} fill="#28522c" sway />
+      <Fatsia x={36} y={-56} size={116} rotate={196} fill="#1c3c21" />
+      <Fatsia x={468} y={-64} size={150} rotate={172} fill="#24492a" sway />
+      <Fatsia x={604} y={-40} size={176} rotate={196} fill="#1b3a20" sway />
+      <Fatsia x={742} y={-72} size={128} rotate={210} fill="#28522c" />
+
+      {/* branch the canopy hangs from, sweeping across the top of frame */}
+      <path d="M-280,-10 C-140,54 60,30 250,58 C420,82 560,44 720,66"
+        fill="none" stroke="#22301f" strokeWidth="5" strokeLinecap="round" opacity="0.8" />
+
+      {/* out-of-focus leaves right at the lens, bottom corners */}
+      <g opacity="0.55">
+        <Fatsia x={-268} y={706} size={150} rotate={22} fill="#16321c" />
+        <Fatsia x={-120} y={724} size={120} rotate={352} fill="#1b3a20" />
+        <Fatsia x={700} y={716} size={140} rotate={334} fill="#16321c" />
+      </g>
     </g>
   );
 }
