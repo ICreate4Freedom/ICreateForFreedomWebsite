@@ -153,6 +153,95 @@ function Planter({
   );
 }
 
+/* Japanese pillar post box — the red 〒 box from the blue-house reference.
+   The one strong warm accent on the right, balancing the shop lanterns. */
+function PostBox({ x, y }: { x: number; y: number }) {
+  return (
+    <g>
+      <rect x={x + 11} y={y + 62} width="10" height="42" fill="#5e2018" />
+      <rect x={x + 4} y={y + 98} width="24" height="7" rx="2" fill="#2a201c" />
+      <rect x={x} y={y + 10} width="32" height="58" rx="3" fill="#a8331f" />
+      <path d={`M${x},${y + 16} a16,14 0 0 1 32,0 z`} fill="#b93b23" />
+      <rect x={x} y={y + 10} width="7" height="58" fill="#8d2a19" opacity="0.5" />
+      <rect x={x + 5} y={y + 22} width="22" height="4" rx="1.5" fill="#3a1109" />
+      <text x={x + 16} y={y + 42} textAnchor="middle" fontFamily="ui-sans-serif, sans-serif" fontSize="10" fill="#f2ded4" opacity="0.8">〒</text>
+      <rect x={x + 6} y={y + 48} width="20" height="11" rx="1.5" fill="#f0e6d8" opacity="0.55" />
+      <ellipse cx={x + 16} cy={y + 105} rx="17" ry="3.5" fill="#0b1015" opacity="0.5" />
+    </g>
+  );
+}
+
+/* A smaller, unlit machine further down the row — Japanese streets rarely
+   have just one. Kept dim so it reads as company for the hero, not a rival. */
+function SideMachine({ x, y, width = 76, height = 210 }: { x: number; y: number; width?: number; height?: number }) {
+  return (
+    <g opacity="0.92">
+      <rect x={x} y={y} width={width} height={height} rx="3" fill="#3f4a4a" stroke="#222b2b" strokeWidth="1.5" />
+      <rect x={x} y={y} width="6" height={height} fill="#4b5757" opacity="0.6" />
+      <rect x={x + 5} y={y + 6} width={width - 10} height="16" rx="1.5" fill="#8d3630" />
+      <text x={x + width / 2} y={y + 18} textAnchor="middle" fontFamily="ui-sans-serif, sans-serif" fontWeight="700" fontSize="9" fill="#e9d9cf" opacity="0.8">たばこ</text>
+      {/* dim product window with a few facings */}
+      <rect x={x + 6} y={y + 28} width={width - 12} height="96" rx="2" fill="#131a1c" stroke="#5d6a68" strokeWidth="1" />
+      {[0, 1, 2].map((row) => (
+        <g key={row}>
+          <rect x={x + 8} y={y + 58 + row * 24} width={width - 16} height="5" fill="#4e5a58" opacity="0.7" />
+          {[0, 1, 2, 3].map((c) => (
+            <rect key={c} x={x + 10 + c * 15} y={y + 36 + row * 24} width="11" height="20" rx="1.5"
+              fill={["#6d7f86", "#7d6a58", "#5f7a63", "#7a6f80"][(row + c) % 4]} opacity="0.55" />
+          ))}
+        </g>
+      ))}
+      <rect x={x + 6} y={y + 132} width={width - 12} height="10" rx="1.5" fill="#1b2224" />
+      <circle cx={x + width - 16} cy={y + 156} r="7" fill="#2a3234" stroke="#525d5c" strokeWidth="1" />
+      <rect x={x + 10} y={y + 150} width="26" height="12" rx="2" fill="#232b2c" />
+      <rect x={x + 8} y={y + 176} width={width - 16} height="22" rx="2" fill="#10161a" />
+      <rect x={x} y={y + height - 8} width={width} height="8" fill="#2a3230" />
+    </g>
+  );
+}
+
+/* Convex road mirror — the fixture that tells you instantly this is a narrow
+   Japanese side street with a blind corner. */
+function TrafficMirror({ x, y, r = 26 }: { x: number; y: number; r?: number }) {
+  return (
+    <g>
+      <rect x={x - 3} y={y} width="6" height={604 - y} fill="#4a4f4c" />
+      <rect x={x - 5} y="596" width="10" height="8" rx="1.5" fill="#313835" />
+      <path d={`M${x},${y + 14} L${x - r * 0.5},${y - 4}`} stroke="#4a4f4c" strokeWidth="3" fill="none" />
+      <circle cx={x - r * 0.55} cy={y - r * 0.72} r={r + 4} fill="#d4711f" opacity="0.9" />
+      <circle cx={x - r * 0.55} cy={y - r * 0.72} r={r} fill="#5d7078" />
+      <circle cx={x - r * 0.55} cy={y - r * 0.72} r={r} fill="url(#vm-mirrorSheen)" />
+      <path d={`M${x - r * 0.55 - r * 0.6},${y - r * 0.72 - r * 0.3} a${r * 0.8},${r * 0.8} 0 0 1 ${r * 0.9},${-r * 0.4}`}
+        fill="none" stroke="#cfe0e6" strokeWidth="2.5" opacity="0.35" />
+    </g>
+  );
+}
+
+/* Laundry pole across a balcony — everyday life, and it breaks the balcony's
+   straight rail line. */
+function Laundry({ x, y, width }: { x: number; y: number; width: number }) {
+  const items = [
+    { o: 0.12, w: 16, h: 30, fill: "#8d9aa2" },
+    { o: 0.34, w: 13, h: 22, fill: "#a8907c" },
+    { o: 0.54, w: 18, h: 34, fill: "#6f8290" },
+    { o: 0.78, w: 11, h: 19, fill: "#93a08d" },
+  ];
+  return (
+    <g>
+      <line x1={x} y1={y} x2={x + width} y2={y} stroke="#6d7570" strokeWidth="2" />
+      {items.map((it, i) => {
+        const ix = x + width * it.o;
+        return (
+          <g key={i} opacity="0.72">
+            <path d={`M${ix},${y + 1} l${it.w / 2},${it.h * 0.16} l${it.w / 2},${-it.h * 0.16} l0,${it.h} l${-it.w},0 z`} fill={it.fill} />
+            <line x1={ix} y1={y + 1} x2={ix} y2={y + 4} stroke="#4c5450" strokeWidth="1" />
+          </g>
+        );
+      })}
+    </g>
+  );
+}
+
 /* A compact, lived-in Japanese side street at blue hour. The environment
    frames the machine but never competes with it: ordinary infrastructure,
    low-rise facades, small light sources, and rain-darkened surfaces do the
@@ -187,6 +276,11 @@ export function EnvironmentBack() {
           <stop offset="0" stopColor="#fff0d0" stopOpacity="0.2" />
           <stop offset="0.58" stopColor="#dfc38e" stopOpacity="0.06" />
           <stop offset="1" stopColor="#dfc38e" stopOpacity="0" />
+        </radialGradient>
+        <radialGradient id="vm-mirrorSheen" cx="0.36" cy="0.3" r="0.75">
+          <stop offset="0" stopColor="#cfe2e8" stopOpacity="0.55" />
+          <stop offset="0.6" stopColor="#5d7078" stopOpacity="0.1" />
+          <stop offset="1" stopColor="#1d2a2e" stopOpacity="0.5" />
         </radialGradient>
         <pattern id="vm-wallTexture" width="52" height="46" patternUnits="userSpaceOnUse">
           <path d="M4,10 l11,-2 M30,14 l7,1 M10,34 l5,-1 M38,38 l9,-1" stroke="#d0c9b2" strokeWidth="0.75" opacity="0.16" />
@@ -362,19 +456,55 @@ export function EnvironmentBack() {
       <Lantern x={650} y={190} />
       <Window x={696} y={184} width={76} height={56} warm />
       <Balcony x={684} y={250} width={102} />
+      <Laundry x={690} y={258} width={94} />
       <Door x={698} y={412} width={68} height={192} warm />
-      <Window x={810} y={260} width={55} height={48} />
-      <Door x={816} y={432} width={58} height={172} />
 
-      {/* External escape stair at the far edge: a familiar low-rise alley
-          detail, kept dark so it frames rather than competes. */}
-      <g fill="none" stroke="#202827" strokeLinecap="round">
-        <path d="M892,164 L944,222 L892,280 L944,338 L892,396 L944,454 L892,512 L944,570" strokeWidth="7" />
-        <path d="M903,164 L955,222 L903,280 L955,338 L903,396 L955,454 L903,512 L955,570" strokeWidth="2" />
-        {[204, 262, 320, 378, 436, 494, 552].map((y) => <line key={y} x1="894" y1={y} x2="951" y2={y + 18} strokeWidth="2" />)}
+      {/* ---- right-side street furniture ----
+           The gap between the two buildings, a second machine keeping the hero
+           company, a projecting bar sign, the post box, and the convex mirror
+           that marks a blind corner. All kept dimmer and cooler than the hero
+           machine so the eye still lands on it first. */}
+
+      {/* narrow gap between the buildings, with a light somewhere down it */}
+      <rect x="482" y="150" width="12" height="454" fill="#070c0e" />
+      <ellipse cx="488" cy="540" rx="12" ry="52" fill="#c79a55" opacity="0.13" />
+      <rect x="482" y="150" width="12" height="8" fill="#141a1a" />
+
+      {/* projecting illuminated sign over the walkway */}
+      <g>
+        <rect x="600" y="232" width="6" height="40" fill="#39423f" />
+        <rect x="604" y="236" width="46" height="30" rx="2" fill="#1f2a2e" stroke="#4d5a5c" strokeWidth="1.2" />
+        <rect x="607" y="239" width="40" height="24" rx="1.5" fill="#e0c98c" opacity="0.5" />
+        <text x="627" y="256" textAnchor="middle" fontFamily="ui-serif, Georgia, serif" fontSize="13" fill="#2c2b25" opacity="0.85">酒処</text>
       </g>
-      <rect x="879" y="132" width="10" height="472" fill="#151d1d" />
-      <path d="M886,166 C872,221 891,288 881,344 C873,390 889,437 882,485" fill="none" stroke="#53635c" strokeWidth="2" opacity="0.54" />
+
+      <SideMachine x={596} y={394} />
+      {/* its cold spill onto the pavement */}
+      <ellipse cx="634" cy="606" rx="52" ry="10" fill="#9fd0d8" opacity="0.07" />
+
+      {/* stoops under the two doorways */}
+      {[[522, 80], [692, 82]].map(([sx, sw], i) => (
+        <g key={i}>
+          <rect x={sx} y="596" width={sw} height="9" rx="1.5" fill="#4a534d" />
+          <rect x={sx + 3} y="592" width={sw - 6} height="5" rx="1.5" fill="#59635c" opacity="0.8" />
+        </g>
+      ))}
+
+      <PostBox x={730} y={498} />
+      <TrafficMirror x={772} y={330} />
+
+      {/* drip stain under the condenser */}
+      <path d="M628,350 C626,392 632,432 629,470" fill="none" stroke="#2c3936" strokeWidth="3" opacity="0.5" />
+      <ellipse cx="629" cy="604" rx="9" ry="3" fill="#0d1417" opacity="0.5" />
+
+      {/* kerb bollards down the pavement edge */}
+      {[560, 700, 764].map((bx) => (
+        <g key={bx}>
+          <rect x={bx} y="574" width="5" height="30" rx="2.5" fill="#48514d" />
+          <rect x={bx} y="580" width="5" height="3" fill="#c8cbc2" opacity="0.45" />
+        </g>
+      ))}
+      <Window x={742} y={300} width={48} height={44} />
 
       {/* The machine's glow, painted after every facade so it spills onto both
           sides of the street. Painted mid-stack it was sliced by the right
