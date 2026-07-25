@@ -11,7 +11,6 @@ import { LowerDoor } from "./parts/LowerDoor";
 import { EnvironmentBack, WetGround, Atmosphere } from "./parts/Environment";
 import { Overgrowth, Foreground } from "./parts/Overgrowth";
 import { Bicycle } from "./parts/Bicycle";
-import { Annotations } from "./parts/Annotations";
 
 const DROP_MS = 700;    // can fall duration
 const SETTLE_MS = 150;  // beat after the can lands, before the route changes
@@ -94,19 +93,17 @@ export default function VendingMachine() {
 
   return (
     <div className="flex h-[calc(100dvh-2.5rem)] w-full items-center justify-center overflow-hidden select-none bg-[#08090e]">
-      {/* The viewBox is tight around the machine (x -260..740) so it commands
-          the frame; "slice" fills the viewport, and narrow screens crop to the
-          machine alone. maxWidth caps the box's aspect ratio so ultrawide
-          monitors letterbox into the dark backdrop instead of slicing the
-          machine's header off the top. */}
+      {/* The SVG always fills the viewport edge to edge — no letterboxing.
+          "slice" trades height for width, so visible height = 1080 / aspect:
+          every window up to ~2.0 shows the machine's full 525-unit height, and
+          past that the crop eats the base plinth and road from the bottom
+          while the header and all four button rows stay clear (they sit above
+          y=400). Narrow screens crop horizontally to the machine alone, which
+          is the phone framing. */}
       <svg
-        viewBox="-260 0 1000 680"
+        viewBox="-300 0 1080 680"
         preserveAspectRatio="xMidYMid slice"
         className="vm-scene h-full w-full"
-        /* 1.78 is the widest box aspect that still shows the machine's full
-           height (viewBox 1000 wide / 1.78 ≈ 562 units visible, vs the 556 the
-           machine occupies). Anything wider starts slicing its feet and roof. */
-        style={{ maxWidth: "calc((100dvh - 2.5rem) * 1.78)" }}
         aria-label="ICreate4Freedom navigation — a vending machine in a Japanese side street, reclaimed by plants; each button vends a page"
       >
         <defs>
@@ -174,7 +171,6 @@ export default function VendingMachine() {
         <g aria-hidden="true" style={{ pointerEvents: "none" }}>
           <Bicycle />
           <Foreground />
-          <Annotations />
           <Atmosphere arriving={arriving} />
 
           {/* arrival shade: the alley starts dim and breathes open */}

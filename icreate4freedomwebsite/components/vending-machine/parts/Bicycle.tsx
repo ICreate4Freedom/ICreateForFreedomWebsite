@@ -5,7 +5,10 @@ function Wheel({ cx, cy, r }: { cx: number; cy: number; r: number }) {
       <circle cx={cx} cy={cy} r={r - 5} fill="none" stroke="#3a463d" strokeWidth="1.5" />
       {Array.from({ length: 12 }).map((_, i) => {
         const a = (i * 30 * Math.PI) / 180;
-        return <line key={i} x1={cx} y1={cy} x2={cx + (r - 4) * Math.cos(a)} y2={cy + (r - 4) * Math.sin(a)} stroke="#4a564d" strokeWidth="1" />;
+        // rounded: raw Math.cos/sin differ between Node and the browser in the
+        // last ULP, which shows up as a React hydration mismatch
+        const round = (v: number) => Math.round(v * 100) / 100;
+        return <line key={i} x1={cx} y1={cy} x2={round(cx + (r - 4) * Math.cos(a))} y2={round(cy + (r - 4) * Math.sin(a))} stroke="#4a564d" strokeWidth="1" />;
       })}
       <circle cx={cx} cy={cy} r="4" fill="#2c362f" />
     </g>
@@ -19,8 +22,8 @@ function Wheel({ cx, cy, r }: { cx: number; cy: number; r: number }) {
 export function Bicycle() {
   return (
     // scaled about its own contact point so the wheels stay on the pavement;
-    // slightly larger than MACHINE_SCALE because it sits nearer the camera
-    <g strokeLinecap="round" transform="translate(240 620) scale(1.1) translate(-240 -620)">
+    // slightly larger than the machine because it sits nearer the camera
+    <g strokeLinecap="round" transform="translate(240 618) scale(1.06) translate(-240 -618)">
       <Wheel cx={140} cy={572} r={54} />
       <Wheel cx={300} cy={566} r={58} />
       <g stroke="#33413a" strokeWidth="7" fill="none">

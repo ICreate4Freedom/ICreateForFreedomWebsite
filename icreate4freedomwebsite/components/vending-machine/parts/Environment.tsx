@@ -1,4 +1,5 @@
 import { Fatsia } from "./Fatsia";
+import { Shrub, Fern, Cane, GrassTuft, BroadLeaf, ClimbingIvy, HangingVine } from "./Flora";
 
 function Shutter({ x, y, width, height }: { x: number; y: number; width: number; height: number }) {
   return (
@@ -98,13 +99,56 @@ function Balcony({ x, y, width }: { x: number; y: number; width: number }) {
   );
 }
 
-function Planter({ x, y, body, leaf }: { x: number; y: number; body: string; leaf: string }) {
+/* Potted plant. The foliage is drawn BEFORE the pot and anchored on the soil
+   line at the rim, so it grows up out of the pot and the pot occludes the stem
+   bases — previously the leaves were rotated ~180° and grew down into the pot.
+   `kind` picks a species so no two planters on the street look alike. */
+function Planter({
+  x, y, body, leaf, kind = "shrub", scale = 1,
+}: { x: number; y: number; body: string; leaf: string; kind?: "shrub" | "fern" | "cane" | "grass"; scale?: number }) {
+  const w = 34 * scale, h = 42 * scale;
+  const soil = y + 1;          // just below the rim
+  const cx = x + w / 2;
   return (
     <g>
-      <path d={`M${x},${y} L${x + 34},${y} L${x + 29},${y + 42} L${x + 5},${y + 42} Z`} fill={body} stroke="#191d1b" strokeWidth="1.2" />
-      <rect x={x - 2} y={y - 3} width="38" height="6" rx="2" fill="#514639" />
-      <Fatsia x={x + 10} y={y + 3} size={30} rotate={205} fill={leaf} />
-      <Fatsia x={x + 25} y={y + 5} size={25} rotate={155} fill={leaf} />
+      {/* foliage first — the pot then overlaps the stems */}
+      {kind === "shrub" && (
+        <>
+          <Shrub x={cx} y={soil} size={38 * scale} fill={leaf} tip="#548f52" />
+          <GrassTuft x={cx - 11 * scale} y={soil} size={19 * scale} fill="#4b7d45" />
+          <GrassTuft x={cx + 12 * scale} y={soil} size={15 * scale} fill="#3d6b3b" />
+        </>
+      )}
+      {kind === "fern" && (
+        <>
+          <Fern x={cx - 7 * scale} y={soil} size={44 * scale} rotate={-16} fill={leaf} />
+          <Fern x={cx + 6 * scale} y={soil} size={40 * scale} rotate={15} fill="#427a44" />
+          <Fern x={cx} y={soil} size={34 * scale} rotate={0} fill="#2f5e33" />
+          <GrassTuft x={cx - 3 * scale} y={soil} size={14 * scale} fill="#4b7d45" />
+        </>
+      )}
+      {kind === "cane" && (
+        <>
+          <Cane x={cx - 6 * scale} y={soil} size={66 * scale} lean={-9} fill={leaf} />
+          <Cane x={cx + 4 * scale} y={soil} size={54 * scale} lean={8} fill="#3f7143" />
+          <Shrub x={cx + 1 * scale} y={soil} size={20 * scale} fill="#2f5e33" tip="#3f7143" />
+        </>
+      )}
+      {kind === "grass" && (
+        <>
+          <GrassTuft x={cx} y={soil} size={40 * scale} blades={13} fill={leaf} />
+          <GrassTuft x={cx - 8 * scale} y={soil} size={27 * scale} fill="#4b7d45" />
+          <BroadLeaf x={cx + 8 * scale} y={soil} size={26 * scale} rotate={22} fill="#2f6135" />
+        </>
+      )}
+      {/* the pot */}
+      <path d={`M${x},${y} L${x + w},${y} L${x + w - 5 * scale},${y + h} L${x + 5 * scale},${y + h} Z`}
+        fill={body} stroke="#191d1b" strokeWidth="1.2" />
+      <path d={`M${x + 3 * scale},${y + 8 * scale} L${x + w - 3 * scale},${y + 8 * scale}`}
+        stroke="#000" strokeOpacity="0.18" strokeWidth="1.5" />
+      <rect x={x - 2 * scale} y={y - 3 * scale} width={w + 4 * scale} height={6 * scale} rx="2" fill="#514639" />
+      {/* damp ring where the pot meets the pavement */}
+      <ellipse cx={cx} cy={y + h} rx={w * 0.5} ry={3 * scale} fill="#0b1015" opacity="0.45" />
     </g>
   );
 }
@@ -172,21 +216,81 @@ export function EnvironmentBack() {
       <rect x="28" y="150" width="18" height="454" fill="#151a1a" />
       <rect x="38" y="155" width="3" height="449" fill="#67533a" opacity="0.42" />
 
-      {/* service half of the shop front */}
-      <rect x="-84" y="150" width="114" height="454" fill="#272d2c" />
+      {/* ---- the little tea shop next to the shutter ----
+           Modelled on the green-door reference: timber post-and-beam front, a
+           lit doorway behind a noren, a hand-lettered vertical sign, a chalk
+           menu, small framed notices, and the clutter of a place that is
+           actually open. This half used to be a bare grey panel. */}
+      <rect x="-84" y="150" width="114" height="454" fill="#2b302c" />
+      <rect x="-84" y="150" width="114" height="454" fill="url(#vm-wallTexture)" opacity="0.4" />
       <line x1="-84" y1="150" x2="-84" y2="604" stroke="#141a1a" strokeWidth="3" />
-      <Door x={-62} y={410} width={58} height={194} />
+      {/* timber frame */}
+      <g fill="#3f3527">
+        <rect x="-84" y="150" width="9" height="454" />
+        <rect x="21" y="150" width="9" height="454" />
+        <rect x="-84" y="358" width="114" height="8" />
+        <rect x="-84" y="196" width="114" height="9" />
+      </g>
+      {/* fascia board with hand-lettered shop name */}
+      <rect x="-86" y="205" width="118" height="34" fill="#26332f" stroke="#171f1c" strokeWidth="1.5" />
+      <text x="-27" y="228" textAnchor="middle" fontFamily="ui-serif, Georgia, serif" fontSize="17" fill="#cbbf9e" opacity="0.88">茶房 ねこ</text>
+      {/* warm interior glow behind the doorway */}
+      <rect x="-70" y="386" width="76" height="218" fill="#c98f45" opacity="0.16" />
+      <Door x={-62} y={410} width={58} height={194} warm />
       {/* noren curtain over the doorway */}
       <g>
-        <rect x="-70" y="392" width="74" height="24" fill="#243a4a" />
-        {[-50, -32, -14].map((x) => <line key={x} x1={x} y1="394" x2={x} y2="416" stroke="#16242f" strokeWidth="1.5" />)}
+        <rect x="-70" y="392" width="74" height="26" fill="#2b4a5c" />
+        <text x="-33" y="410" textAnchor="middle" fontFamily="ui-serif, Georgia, serif" fontSize="13" fill="#dfe8ea" opacity="0.75">ゆ</text>
+        {[-52, -14].map((x) => <line key={x} x1={x} y1="394" x2={x} y2="418" stroke="#16242f" strokeWidth="1.5" />)}
         <rect x="-72" y="388" width="78" height="5" rx="1.5" fill="#3b3229" />
       </g>
+      {/* vertical hanging sign board, lit from the lamp above */}
+      <g>
+        <rect x="-118" y="250" width="30" height="104" rx="2" fill="#e7dcc2" opacity="0.9" stroke="#8d8468" strokeWidth="1.5" />
+        <rect x="-120" y="246" width="34" height="7" rx="2" fill="#3b3229" />
+        {["茶", "と", "本"].map((ch, i) => (
+          <text key={ch} x="-103" y={280 + i * 30} textAnchor="middle" fontFamily="ui-serif, Georgia, serif" fontSize="19" fill="#2f3a33">{ch}</text>
+        ))}
+        <line x1="-103" y1="238" x2="-103" y2="247" stroke="#2a2f2b" strokeWidth="1.5" />
+      </g>
+      {/* chalk menu board leaning by the door */}
+      <g transform="rotate(-3 -104 470)">
+        <rect x="-124" y="428" width="42" height="58" rx="2" fill="#5c4a33" />
+        <rect x="-120" y="432" width="34" height="50" rx="1" fill="#1e2a26" />
+        {[440, 449, 458, 467, 476].map((y, i) => (
+          <line key={y} x1="-116" y1={y} x2={-116 + (i % 2 ? 20 : 26)} y2={y} stroke="#a8c7b0" strokeWidth="1.4" opacity={0.75} />
+        ))}
+      </g>
+      {/* small framed notices beside the door */}
+      {[[-80, 288, 22, 26], [-80, 322, 22, 20]].map(([x, y, w, h], i) => (
+        <g key={i}>
+          <rect x={x} y={y} width={w} height={h} rx="1" fill="#d9d2bd" opacity="0.55" stroke="#7b7460" strokeWidth="0.8" />
+          {[0.3, 0.55, 0.8].map((t) => (
+            <line key={t} x1={x + 3} y1={y + h * t} x2={x + w - 4} y2={y + h * t} stroke="#4b4a3e" strokeWidth="0.7" opacity="0.5" />
+          ))}
+        </g>
+      ))}
+      {/* wall lamp over the sign */}
+      <Lantern x={-96} y={222} />
+      {/* a pair of red paper lanterns strung outside */}
+      {[[-140, 262, 13], [-166, 272, 10]].map(([lx, ly, r], i) => (
+        <g key={i}>
+          <line x1={lx} y1={ly - 26} x2={lx} y2={ly - r - 2} stroke="#2a2a26" strokeWidth="1.2" />
+          <ellipse cx={lx} cy={ly} rx={r} ry={r * 1.24} fill="#c2452a" />
+          <ellipse cx={lx} cy={ly} rx={r} ry={r * 1.24} fill="#ff8352" opacity="0.32" />
+          {[-0.55, 0, 0.55].map((t) => (
+            <ellipse key={t} cx={lx} cy={Math.round((ly + r * 1.24 * t) * 100) / 100}
+              rx={Math.round(r * Math.sqrt(1 - t * t) * 0.98 * 100) / 100} ry="1"
+              fill="none" stroke="#8d2c18" strokeWidth="0.9" opacity="0.75" />
+          ))}
+          <rect x={lx - r * 0.34} y={ly + r * 1.2} width={r * 0.68} height="3" rx="1" fill="#2a2a26" />
+        </g>
+      ))}
       {/* meter box + conduit */}
-      <rect x="6" y="330" width="26" height="40" rx="2" fill="#3d4441" />
-      <rect x="10" y="336" width="18" height="14" rx="1.5" fill="#8b9089" opacity="0.5" />
-      <path d="M18,370 C15,410 23,450 19,496" fill="none" stroke="#333b38" strokeWidth="2.5" />
-      {/* stacked beer crates against the wall */}
+      <rect x="6" y="300" width="24" height="36" rx="2" fill="#3d4441" />
+      <rect x="10" y="306" width="16" height="12" rx="1.5" fill="#8b9089" opacity="0.5" />
+      <path d="M18,336 C15,386 23,436 19,496" fill="none" stroke="#333b38" strokeWidth="2.5" />
+      {/* stacked beer crates, a bucket, and a shop cat on top */}
       {[[-72, 550], [-72, 524], [-40, 550]].map(([x, y], i) => (
         <g key={i}>
           <rect x={x} y={y} width="34" height="24" rx="2" fill={i === 1 ? "#4a3b2a" : "#3f4a3c"} stroke="#1d2320" strokeWidth="1.2" />
@@ -194,6 +298,21 @@ export function EnvironmentBack() {
           <line x1={x + 17} y1={y + 2} x2={x + 17} y2={y + 22} stroke="#1d2320" strokeWidth="1" opacity="0.5" />
         </g>
       ))}
+      {/* the cat: a silhouette curled on the crate stack */}
+      <g fill="#15191a">
+        <ellipse cx="-55" cy="516" rx="17" ry="8" />
+        <circle cx="-42" cy="510" r="7" />
+        <path d="M-47,505 l1,-6 l5,3 z M-39,505 l4,-5 l2,6 z" />
+        <path d="M-71,518 c-7,-2 -9,-9 -3,-11 c3,-1 4,2 2,4 c-2,2 0,5 3,5 z" />
+      </g>
+      <circle cx="-44" cy="510" r="1" fill="#c8d76a" opacity="0.85" />
+      <circle cx="-40" cy="510" r="1" fill="#c8d76a" opacity="0.85" />
+      {/* galvanised bucket by the crates */}
+      <path d="M-20,578 L0,578 L-3,600 L-17,600 Z" fill="#59615c" stroke="#2b322e" strokeWidth="1.2" />
+      <path d="M-20,578 Q-10,568 0,578" fill="none" stroke="#2b322e" strokeWidth="1.2" />
+      {/* ivy taking the shop's corner post */}
+      <ClimbingIvy x={26} y={600} height={250} leaf={9} fill="#2c5230" side={-1} opacity={0.95} />
+      <HangingVine x={-86} y={205} length={132} leaf={9} amp={10} phase={1.1} fill="#2a5730" opacity={0.95} />
       {/* a second bicycle parked further down the alley, small and dim */}
       <g stroke="#2b3331" strokeWidth="2" fill="none" opacity="0.7">
         <circle cx="-208" cy="578" r="19" />
@@ -278,12 +397,13 @@ export function EnvironmentBack() {
       ))}
       {[-372, -226, -78, 476, 624, 812].map((x) => <rect key={x} x={x} y="636" width="64" height="2" rx="1" fill="#8ca19a" opacity="0.14" />)}
       <ellipse cx="240" cy="621" rx="188" ry="13" fill="#000" opacity="0.36" />
-      <Planter x={-6} y={558} body="#6f4e39" leaf="#31593b" />
-      <Planter x={36} y={567} body="#5b6564" leaf="#2c4d34" />
-      <Planter x={472} y={569} body="#72503b" leaf="#2c5235" />
-      <Planter x={780} y={568} body="#63665b" leaf="#31573a" />
-      <Fatsia x={8} y={563} size={38} rotate={210} fill="#315d3b" />
-      <Fatsia x={905} y={602} size={32} rotate={350} fill="#294a30" />
+      <Planter x={-8} y={556} body="#6f4e39" leaf="#31593b" kind="fern" />
+      <Planter x={34} y={566} body="#5b6564" leaf="#2c4d34" kind="grass" scale={0.9} />
+      <Planter x={470} y={566} body="#72503b" leaf="#2c5235" kind="cane" />
+      <Planter x={516} y={572} body="#4d5b52" leaf="#31573a" kind="shrub" scale={0.85} />
+      <Planter x={676} y={568} body="#63665b" leaf="#31573a" kind="fern" scale={0.95} />
+      <GrassTuft x={128} y={604} size={16} fill="#3a5f38" opacity={0.8} />
+      <GrassTuft x={352} y={604} size={13} fill="#3a5f38" opacity={0.7} />
     </g>
   );
 }
@@ -302,10 +422,10 @@ export function WetGround() {
       </defs>
       <rect x="-480" y="622" width="1440" height="58" fill="#0b1720" opacity="0.2" />
       <g mask="url(#vm-reflectionMask)">
-        {/* widened to match the machine's scaled footprint (x 81..399) */}
-        <rect x="84" y="628" width="312" height="13" fill="#d0cfbf" opacity="0.3" />
-        <rect x="92" y="642" width="298" height="16" fill="#2b6fae" opacity="0.23" />
-        <path d="M98,657 C162,651 252,665 310,657 C344,652 376,658 392,655 L392,666 L98,666 Z" fill="#e6e8e4" opacity="0.16" />
+        {/* matches the machine's footprint (x 90..390) */}
+        <rect x="92" y="628" width="296" height="13" fill="#d0cfbf" opacity="0.3" />
+        <rect x="100" y="642" width="280" height="16" fill="#2b6fae" opacity="0.23" />
+        <path d="M106,657 C166,651 252,665 308,657 C340,652 370,658 386,655 L386,666 L106,666 Z" fill="#e6e8e4" opacity="0.16" />
       </g>
       {[
         { cx: -188, cy: 657, rx: 72, ry: 7, rim: "#5f7681" },

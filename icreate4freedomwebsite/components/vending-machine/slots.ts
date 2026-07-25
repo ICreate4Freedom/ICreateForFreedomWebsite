@@ -50,12 +50,12 @@ export const slotName = (s: Slot) => s.id[0].toUpperCase() + s.id.slice(1);
    paths, which are userSpaceOnUse — inherits this transform, so no part
    coordinate ever has to change. Scaled about the machine's own centre so it
    grows in place rather than drifting. */
-export const MACHINE_SCALE = 1.06;
-const MACHINE_CX = 240;  // (90 + 390) / 2 — the body's horizontal centre
-const MACHINE_CY = 614;  // pivot at the FEET, so the machine grows upward and
-                         // its base stays planted on the pavement at y≈620
-export const MACHINE_TRANSFORM =
-  `translate(${MACHINE_CX} ${MACHINE_CY}) scale(${MACHINE_SCALE}) translate(${-MACHINE_CX} ${-MACHINE_CY})`;
+/* The machine draws at its natural size (x 90..390, y 95..620). Prominence
+   comes from the viewBox being tight around it rather than from scaling it up:
+   a scaled machine needs more vertical room than a wide window has, which is
+   what forced the old letterboxing. Kept as a transform hook so the assembly
+   can still be nudged as one unit. */
+export const MACHINE_TRANSFORM = "translate(0 0)";
 
 // ---- machine geometry (shared by parts + animation math) ----
 export const CAN_W = 24;
