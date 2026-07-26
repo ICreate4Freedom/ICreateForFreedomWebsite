@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import Link from "next/link";
 import { SLOTS } from "@/components/vending-machine/slots";
+import { AudioProvider } from "@/components/audio/AudioProvider";
+import { SoundToggle } from "@/components/audio/SoundToggle";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -48,25 +50,31 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <div className="flex-1">{children}</div>
-        {/* plain-text fallback for the vending-machine nav */}
-        {/* fixed h-10 (2.5rem): pages size themselves with calc(100dvh-2.5rem) */}
-        <footer className="flex h-10 items-center justify-center bg-neutral-950 font-mono text-xs text-neutral-400">
-          <nav aria-label="Site navigation">
-            <Link href="/" className="mx-2 hover:text-neutral-300">
-              home
-            </Link>
-            {SLOTS.map((slot) => (
-              <Link
-                key={slot.id}
-                href={slot.route}
-                className="mx-2 hover:text-neutral-300"
-              >
-                {slot.id}
+        {/* Wraps everything so one AudioContext outlives every vend: the rain
+            keeps falling while you're in a room, just heard through the door. */}
+        <AudioProvider>
+          <div className="flex-1">{children}</div>
+          {/* plain-text fallback for the vending-machine nav */}
+          {/* fixed h-10 (2.5rem): pages size themselves with calc(100dvh-2.5rem) */}
+          <footer className="relative flex h-10 items-center justify-center bg-neutral-950 font-mono text-xs text-neutral-400">
+            <nav aria-label="Site navigation">
+              <Link href="/" className="mx-2 hover:text-neutral-300">
+                home
               </Link>
-            ))}
-          </nav>
-        </footer>
+              {SLOTS.map((slot) => (
+                <Link
+                  key={slot.id}
+                  href={slot.route}
+                  className="mx-2 hover:text-neutral-300"
+                >
+                  {slot.id}
+                </Link>
+              ))}
+            </nav>
+            {/* absolute so the nav stays centred on the strip, not pushed left */}
+            <SoundToggle />
+          </footer>
+        </AudioProvider>
       </body>
     </html>
   );

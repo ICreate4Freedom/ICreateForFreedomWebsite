@@ -12,6 +12,8 @@ import { EnvironmentBack, WetGround, Atmosphere } from "./parts/Environment";
 import { Overgrowth, Foreground } from "./parts/Overgrowth";
 import { Bicycle } from "./parts/Bicycle";
 import { RainBack, RainFront, RainHaze } from "./parts/Rain";
+import { useSound } from "../audio/AudioProvider";
+import { IMPACT_FRACTION, CLUNK_LEAD_S } from "../audio/sounds";
 
 const DROP_MS = 700;    // can fall duration
 const SETTLE_MS = 150;  // beat after the can lands, before the route changes
@@ -32,6 +34,7 @@ const reducedSnapshot = () => window.matchMedia(REDUCED_MQ).matches;
 
 export default function VendingMachine() {
   const router = useRouter();
+  const { play } = useSound();
   const [hovered, setHovered] = useState<string | null>(null);
   const [dispensing, setDispensing] = useState<Slot | null>(null);
   const [idle, setIdle] = useState(false);
@@ -74,7 +77,14 @@ export default function VendingMachine() {
     if (dispensing) return;
     setIdle(false);
     if (idleTimer.current) clearTimeout(idleTimer.current);
+    play("press");
     if (reduced) { router.push(slot.route); return; } // no animation, just go
+    /* Booked now, on the audio clock, rather than fired later by a timer: the
+       clunk lands exactly on the can's impact no matter how busy the main
+       thread gets — and it still plays if this component unmounts mid-fall.
+       The can hits at vm-drop's 70% keyframe and only bounces after, so this is
+       not the end of the animation. */
+    play("clunk", (DROP_MS * IMPACT_FRACTION) / 1000 - CLUNK_LEAD_S);
     setDispensing(slot);
     timer.current = setTimeout(() => router.push(slot.route), DROP_MS + SETTLE_MS);
   };
