@@ -123,17 +123,6 @@
   transform-origin: 0 0;
 }
 
-/* B4 — annotation hierarchy: the machine-vision layer rests quiet and wakes
-   while a cursor is in the scene. Touch devices simply keep the resting
-   state; the layer is decor either way. */
-.vm-annotations {
-  opacity: 0.4;
-  transition: opacity 500ms ease;
-}
-.vm-scene:hover .vm-annotations {
-  opacity: 1;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .vm-sway,
   .vm-marquee {
@@ -153,10 +142,4 @@
   .vm-ripple {
     display: none;
   }
-}
-
-/* Wayside annotations that only make sense when the wide scene is visible;
-   on narrow screens the scene crops to the machine and these would dangle. */
-@media (max-width: 768px) {
-  .vm-wide-only { display: none; }
 }

@@ -1,10 +1,6 @@
 import { Fatsia } from "./Fatsia";
 import { Fern, BroadLeaf, GrassTuft, Shrub, Cane, HangingVine, ClimbingIvy } from "./Flora";
 
-export function Pot() {
-  return <path d="M396,566 L444,566 L436,624 L404,624 Z" fill="#a4552e" stroke="#7c3f21" strokeWidth="2" />;
-}
-
 /* MIDGROUND greenery — drawn behind the machine, at the wall bases and along
    the machine's right edge. The frame-crowding canopy lives in Foreground. */
 export function Overgrowth() {

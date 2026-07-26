@@ -60,9 +60,6 @@ export function Room({ slotId, lede, children }: RoomProps) {
           {/* the way out — the same flap you collected the can from */}
           <footer className="mt-20 flex justify-center">
             <Link href="/" className="group inline-flex flex-col items-center gap-1.5">
-              <span className="font-mono text-[0.65rem] tracking-[0.25em] text-[var(--room-muted)]">
-                PUSH
-              </span>
               <span className="flex h-11 w-52 items-center justify-center rounded-md border-2 border-[#b9bdc2]/40 bg-black/30 font-mono text-xs tracking-wider text-[var(--room-text)] motion-safe:transition-transform group-hover:translate-y-0.5 group-active:translate-y-1">
                 ← BACK TO THE MACHINE
               </span>
